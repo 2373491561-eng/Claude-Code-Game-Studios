@@ -118,7 +118,7 @@ func _do_dodge(aim: Vector2, is_perfect: bool = false) -> void:
 			_perfect_overlay.size = Vector2(960, 540)
 			add_child(_perfect_overlay)
 			_perfect_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_perfect_overlay.visible = true
+		_perfect_overlay.visible = true
 	else:
 
 	var tween: Tween = create_tween()
