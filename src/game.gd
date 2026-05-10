@@ -12,6 +12,7 @@ var _player_hp: int = 3
 var _player_iframe_end: int = 0
 var _perfect_overlay: ColorRect = null
 var _enemies: Array = []
+var _enemy_bullets: Array = []
 var _wave_number: int = 1
 var _kill_count: int = 0
 
@@ -41,24 +42,25 @@ func _spawn_wave() -> void:
 		if is_instance_valid(e.rect):
 			e.rect.queue_free()
 	_enemies.clear()
-	var count: int = 2 + _wave_number
 	var px: float = $Player.global_position.x
 	var py: float = $Player.global_position.y
-	for i in range(count):
+	for i in range(_wave_number + 2):
+		var is_medium: bool = (i == _wave_number + 1) and _wave_number >= 2
 		var rect := ColorRect.new()
-		rect.color = Color(0.2, 1, 0.2, 1)
-		rect.size = Vector2(24, 24)
-		var ex: float
-		var ey: float
+		if is_medium:
+			rect.color = Color(1, 0.8, 0.2, 1)
+			rect.size = Vector2(40, 40)
+		else:
+			rect.color = Color(0.2, 1, 0.2, 1)
+			rect.size = Vector2(24, 24)
+		var ex: float; var ey: float
 		while true:
-			ex = randi_range(100, 800)
-			ey = randi_range(100, 400)
-			if Vector2(ex - px, ey - py).length() > 200.0:
-				break
+			ex = randi_range(100, 800); ey = randi_range(100, 400)
+			if Vector2(ex - px, ey - py).length() > 200.0: break
 		rect.position = Vector2(ex, ey)
 		add_child(rect)
-		_enemies.append({"rect": rect, "hp": 3, "max_hp": 3})
-	print("WAVE %d: %d enemies!" % [_wave_number, _enemies.size()])
+		_enemies.append({"rect": rect, "hp": 5 if is_medium else 3, "max_hp": 5 if is_medium else 3, "type": "medium" if is_medium else "small", "shoot_cd": 0})
+	print("WAVE %d: %d enemies" % [_wave_number, _enemies.size()])
 func _process(delta: float) -> void:
 	var inp: Node = $InputSystem
 	if not inp:
@@ -76,13 +78,30 @@ func _process(delta: float) -> void:
 	# Enemy AI
 	for e in _enemies:
 		if e.hp <= 0: continue
-		var epos: Vector2 = e.rect.position + Vector2(12, 12)
+		var epos: Vector2 = e.rect.position + e.rect.size / 2.0
 		var to_player: Vector2 = $Player.global_position - epos
 		var dist: float = to_player.length()
-		if dist > 0.1:
-			e.rect.position += to_player.normalized() * 120.0 * delta * Engine.time_scale
-		# Contact damage
-		if dist < 30.0 and Time.get_ticks_msec() > _player_iframe_end:
+		if e.type == "small":
+			if dist > 0.1:
+				e.rect.position += to_player.normalized() * 120.0 * delta * Engine.time_scale
+		else:
+			# Medium: keep distance 150px
+			if dist < 120.0 and dist > 0.1:
+				e.rect.position -= to_player.normalized() * 80.0 * delta * Engine.time_scale
+			elif dist > 180.0 and dist > 0.1:
+				e.rect.position += to_player.normalized() * 80.0 * delta * Engine.time_scale
+			# Shoot
+			e.shoot_cd -= delta * Engine.time_scale
+			if e.shoot_cd <= 0:
+				e.shoot_cd = 2.0
+				var bullet := ColorRect.new()
+				bullet.color = Color(1, 0.5, 0, 1)
+				bullet.size = Vector2(6, 6)
+				bullet.position = epos - Vector2(3, 3)
+				add_child(bullet)
+				_enemy_bullets.append({"rect": bullet, "pos": epos, "vel": to_player.normalized() * 150.0})
+		# Contact damage for both types
+		if dist < e.rect.size.x * 0.7 and Time.get_ticks_msec() > _player_iframe_end:
 			_player_hp -= 1
 			_player_iframe_end = Time.get_ticks_msec() + 1000
 			$Player/PlayerSprite.color = Color(1, 1, 1, 1)
@@ -92,8 +111,26 @@ func _process(delta: float) -> void:
 				_player_iframe_end = Time.get_ticks_msec() + 3000
 				_player_hp = 3
 				$Player.global_position = Vector2(480, 400)
-				print("YOU DIED!")
 
+	# Move enemy bullets
+	for i in range(_enemy_bullets.size() - 1, -1, -1):
+		var b: Dictionary = _enemy_bullets[i]
+		b.pos += b.vel * delta * Engine.time_scale
+		b.rect.position = b.pos - Vector2(3, 3)
+		if b.pos.x < 0 or b.pos.x > 960 or b.pos.y < 0 or b.pos.y > 540:
+			b.rect.queue_free(); _enemy_bullets.remove_at(i); continue
+		var dist_to_player: float = b.pos.distance_to($Player.global_position)
+		if dist_to_player < 16.0 and Time.get_ticks_msec() > _player_iframe_end:
+			_player_hp -= 1
+			_player_iframe_end = Time.get_ticks_msec() + 1000
+			$Player/PlayerSprite.color = Color(1, 1, 1, 1)
+			var ht: Tween = create_tween()
+			ht.tween_property($Player/PlayerSprite, "color", Color(1, 0.3, 0.3, 1), 0.3)
+			b.rect.queue_free(); _enemy_bullets.remove_at(i)
+			if _player_hp <= 0:
+				_player_iframe_end = Time.get_ticks_msec() + 3000
+				_player_hp = 3
+				$Player.global_position = Vector2(480, 400)
 	# Shooting
 	if not _is_dodging:
 		if shoot and not _was_shooting: _last_fire_ms = 0
@@ -229,6 +266,9 @@ func _draw() -> void:
 	for t in _bullet_trails:
 		var a: float = clamp(t.life / 0.15, 0.0, 1.0)
 		draw_line(t.origin, t.end, Color(1, 0.8, 0.2, a), 2)
+	for b in _enemy_bullets:
+		draw_circle(b.pos, 3, Color(0, 0.5, 1, 1))
+
 	for s in _skill_effects:
 		var a: float = clamp(s.life / 0.5, 0.0, 1.0)
 		draw_arc(s.pos, s.radius, 0, TAU, 36, Color(0.2, 0.6, 1, a), 3)
