@@ -1,6 +1,6 @@
 extends Node2D
 
-# Player state
+# Player
 var _player_hp: int = 3
 var _max_player_hp: int = 3
 var _player_iframe_end: int = 0
@@ -34,6 +34,8 @@ var _wave_number: int = 1
 var _kill_count: int = 0
 var _showing_upgrades: bool = false
 var _upgrade_choices: Array = []
+
+# Visual
 var _death_particles: Array = []
 
 func _ready() -> void:
@@ -55,7 +57,6 @@ func _ready() -> void:
 	_safe_set($Player/DiegeticUI, "skill_system", $Player/SkillSystem)
 	_safe_set($HUD, "wave_manager", $WaveManager)
 	_spawn_wave()
-	print("Game ready! Wave %d" % _wave_number)
 
 # ============================================================
 # SPAWN
@@ -91,9 +92,8 @@ func _spawn_wave() -> void:
 			"hp": 5 if is_medium else 3,
 			"max_hp": 5 if is_medium else 3,
 			"type": "medium" if is_medium else "small",
-			"shoot_cd": 0.0
+			"shoot_cd": 0.0,
 		})
-	print("WAVE %d: %d enemies" % [_wave_number, _enemies.size()])
 
 # ============================================================
 # MAIN LOOP
@@ -113,7 +113,7 @@ func _process(delta: float) -> void:
 	if mx.length() > 0.1:
 		_last_move_dir = mx.normalized()
 
-	# Player movement
+	# Movement
 	if not _is_dodging:
 		$Player.global_position += mx * _move_speed * delta
 
@@ -124,11 +124,9 @@ func _process(delta: float) -> void:
 		var epos: Vector2 = e.rect.position + e.rect.size / 2.0
 		var to_player: Vector2 = $Player.global_position - epos
 		var dist: float = to_player.length()
-		# Small: chase
 		if e.type == "small":
 			if dist > 0.1:
 				e.rect.position += to_player.normalized() * 120.0 * delta * Engine.time_scale
-		# Medium: keep distance + shoot
 		else:
 			if dist < 120.0 and dist > 0.1:
 				e.rect.position -= to_player.normalized() * 80.0 * delta * Engine.time_scale
@@ -143,9 +141,7 @@ func _process(delta: float) -> void:
 				bullet.position = epos - Vector2(3, 3)
 				add_child(bullet)
 				_enemy_bullets.append({"rect": bullet, "pos": epos, "vel": to_player.normalized() * 150.0})
-		# Contact damage
-		var hit_size: float = e.rect.size.x * 0.7
-		if dist < hit_size and Time.get_ticks_msec() > _player_iframe_end:
+		if dist < e.rect.size.x * 0.7 and Time.get_ticks_msec() > _player_iframe_end:
 			_hurt_player()
 
 	# Enemy bullets
@@ -179,16 +175,6 @@ func _process(delta: float) -> void:
 			var d: float = $Player.global_position.distance_to(e.rect.position + e.rect.size / 2.0)
 			if d < nearest_dist:
 				nearest_dist = d
-	for dp in _death_particles:
-		var a: float = clamp(dp.life / 0.4, 0.0, 1.0)
-		draw_rect(Rect2(dp.pos.x - 3, dp.pos.y - 3, 6, 6), Color(dp.color.r, dp.color.g, dp.color.b, a))
-	for e in _enemies:
-		if e.hp <= 0: continue
-		var ep: Vector2 = e.rect.position
-		var es: Vector2 = e.rect.size
-		var ratio: float = float(e.hp) / float(e.max_hp)
-		draw_rect(Rect2(ep.x, ep.y - 8, es.x, 4), Color(0.2, 0.2, 0.2, 0.7))
-		draw_rect(Rect2(ep.x, ep.y - 8, es.x * ratio, 4), Color.RED if ratio < 0.5 else Color.GREEN)
 		for b in _enemy_bullets:
 			var bd: float = $Player.global_position.distance_to(b.pos)
 			if bd < nearest_dist:
@@ -208,15 +194,12 @@ func _process(delta: float) -> void:
 			if _perfect_overlay:
 				_perfect_overlay.visible = false
 
-	# Debug label
-	var dbg: Label = $DebugLabel
-	if dbg:
-		var alive: int = 0
-		for e in _enemies:
-			if e.hp > 0:
-				alive += 1
-		var skill_ready: bool = Time.get_ticks_msec() - _skill_cooldown_ms > 3000
-		dbg.text = "HP:%d/%d | Wave:%d | Enemies:%d | Kills:%d | Dodge:%s | Skill:%s" % [_player_hp, _max_player_hp, _wave_number, alive, _kill_count, _is_dodging, skill_ready]
+	# Iframe blink
+	if Time.get_ticks_msec() < _player_iframe_end:
+		var blink: float = sin(Time.get_ticks_msec() * 0.02)
+		$Player/PlayerSprite.modulate.a = 1.0 if blink > 0 else 0.3
+	elif _player_hp > 0:
+		$Player/PlayerSprite.modulate.a = 1.0
 
 	# Bullet trails
 	for i in range(_bullet_trails.size() - 1, -1, -1):
@@ -229,12 +212,6 @@ func _process(delta: float) -> void:
 		_skill_effects[i].radius += 400.0 * delta
 		if _skill_effects[i].life <= 0:
 			_skill_effects.remove_at(i)
-	# Iframe blink
-	if Time.get_ticks_msec() < _player_iframe_end:
-		var blink: float = sin(Time.get_ticks_msec() * 0.02)
-		$Player/PlayerSprite.modulate.a = 1.0 if blink > 0 else 0.3
-	elif _player_hp > 0:
-		$Player/PlayerSprite.modulate.a = 1.0
 	# Death particles
 	for i in range(_death_particles.size() - 1, -1, -1):
 		var dp: Dictionary = _death_particles[i]
@@ -242,6 +219,16 @@ func _process(delta: float) -> void:
 		dp.life -= delta
 		if dp.life <= 0:
 			_death_particles.remove_at(i)
+
+	# Debug
+	var dbg: Label = $DebugLabel
+	if dbg:
+		var alive: int = 0
+		for e in _enemies:
+			if e.hp > 0:
+				alive += 1
+		var skill_ready: bool = Time.get_ticks_msec() - _skill_cooldown_ms > 3000
+		dbg.text = "HP:%d/%d | Wave:%d | En:%d | Kill:%d | Dodge:%s | Skill:%s" % [_player_hp, _max_player_hp, _wave_number, alive, _kill_count, _is_dodging, skill_ready]
 	queue_redraw()
 
 # ============================================================
@@ -272,12 +259,11 @@ func _fire_bullet(aim: Vector2) -> void:
 		closest.rect.color = Color(1, 0.2, 0.2, 1)
 		if closest.hp <= 0:
 			closest.rect.visible = false
-			_spawn_particles(closest.rect.position + closest.rect.size / 2.0, closest.rect.color)
 			_kill_count += 1
+			_spawn_particles(closest.rect.position + closest.rect.size / 2.0, closest.rect.color)
 			_check_wave_clear()
 		else:
 			var t := create_tween()
-			t.tween_property(closest.rect, "color", closest.rect.color, 0.0)
 			t.tween_property(closest.rect, "color", Color(0.2, 1, 0.2, 1) if closest.type == "small" else Color(1, 0.8, 0.2, 1), 0.2)
 	_bullet_trails.append({"origin": origin, "end": endpoint, "life": 0.15})
 
@@ -291,8 +277,8 @@ func _do_skill() -> void:
 			e.rect.color = Color(1, 0.2, 0.2, 1)
 			if e.hp <= 0:
 				e.rect.visible = false
-				_spawn_particles(e.rect.position + e.rect.size / 2.0, e.rect.color)
 				_kill_count += 1
+				_spawn_particles(e.rect.position + e.rect.size / 2.0, e.rect.color)
 				_check_wave_clear()
 	_skill_effects.append({"pos": origin, "radius": 0.0, "life": 0.5})
 
@@ -340,6 +326,12 @@ func _hurt_player() -> void:
 		_player_hp = _max_player_hp
 		$Player.global_position = Vector2(480, 400)
 
+func _spawn_particles(pos: Vector2, col: Color) -> void:
+	for i in range(8):
+		var angle: float = TAU * float(i) / 8.0
+		var speed: float = randf_range(60.0, 150.0)
+		_death_particles.append({"pos": pos, "vel": Vector2(cos(angle), sin(angle)) * speed, "life": 0.4, "color": col})
+
 # ============================================================
 # WAVE / UPGRADES
 # ============================================================
@@ -356,26 +348,26 @@ func _show_upgrades() -> void:
 	_showing_upgrades = true
 	_upgrade_choices.clear()
 	var pool: Array = [
-		{"name": "Fire Rate +25%", "id": "fire_rate", "icon": "🔥"},
-		{"name": "Damage +1", "id": "damage", "icon": "💪"},
-		{"name": "Max HP +1", "id": "max_hp", "icon": "❤️"},
-		{"name": "Move Speed +20%", "id": "move_speed", "icon": "🏃"},
-		{"name": "Dodge CD -200ms", "id": "dodge_cd", "icon": "🔄"},
-		{"name": "Skill CD -1s", "id": "skill_cd", "icon": "⚡"},
+		{"name": "Fire Rate +25%", "id": "fire_rate"},
+		{"name": "Damage +1", "id": "damage"},
+		{"name": "Max HP +1", "id": "max_hp"},
+		{"name": "Move Speed +20%", "id": "move_speed"},
+		{"name": "Dodge CD -200ms", "id": "dodge_cd"},
+		{"name": "Skill CD -1s", "id": "skill_cd"},
 	]
 	pool.shuffle()
 	var label := Label.new()
-	label.text = "WAVE %d CLEARED! Choose upgrade (1/2/3):" % _wave_number
-	label.position = Vector2(280, 350)
+	label.text = "WAVE %d CLEARED! Choose upgrade:" % _wave_number
+	label.position = Vector2(300, 350)
 	label.add_theme_font_size_override("font_size", 14)
 	add_child(label)
 	_upgrade_choices.append(label)
 	for i in range(3):
 		var opt: Dictionary = pool[i]
 		var btn := Button.new()
-		btn.text = "%s  [%d] %s" % [opt.icon, i + 1, opt.name]
-		btn.position = Vector2(300, 390 + i * 44)
-		btn.size = Vector2(360, 36)
+		btn.text = "[%d] %s" % [i + 1, opt.name]
+		btn.position = Vector2(320, 390 + i * 44)
+		btn.size = Vector2(320, 36)
 		btn.pressed.connect(func(id=opt.id): _pick_upgrade(id))
 		add_child(btn)
 		_upgrade_choices.append(btn)
@@ -388,19 +380,12 @@ func _pick_upgrade(id: String) -> void:
 	_showing_upgrades = false
 	Engine.time_scale = 1.0
 	match id:
-		"fire_rate":
-			_fire_interval_ms = max(50, _fire_interval_ms - 30)
-		"damage":
-			_bonus_damage += 1
-		"max_hp":
-			_max_player_hp += 1
-			_player_hp = min(_player_hp + 1, _max_player_hp)
-		"move_speed":
-			_move_speed += 60.0
-		"dodge_cd":
-			_dodge_end_ms = 0
-		"skill_cd":
-			_skill_cooldown_ms = 0
+		"fire_rate": _fire_interval_ms = max(50, _fire_interval_ms - 30)
+		"damage": _bonus_damage += 1
+		"max_hp": _max_player_hp += 1; _player_hp = min(_player_hp + 1, _max_player_hp)
+		"move_speed": _move_speed += 60.0
+		"dodge_cd": _dodge_end_ms = 0
+		"skill_cd": _skill_cooldown_ms = 0
 	_wave_number += 1
 	_spawn_wave()
 
@@ -408,41 +393,39 @@ func _pick_upgrade(id: String) -> void:
 # RENDER
 # ============================================================
 
-
-func _spawn_particles(pos: Vector2, col: Color) -> void:
-	for i in range(8):
-		var angle: float = TAU * float(i) / 8.0
-		var speed: float = randf_range(60.0, 150.0)
-		_death_particles.append({"pos": pos, "vel": Vector2(cos(angle), sin(angle)) * speed, "life": 0.4, "color": col})
 func _draw() -> void:
 	# Player HP bar
 	var px: Vector2 = $Player.global_position
 	var bar_w: float = 40.0
 	var bar_h: float = 5.0
-	var bar_x: float = px.x - bar_w / 2.0
-	var bar_y: float = px.y - 30.0
 	var hp_ratio: float = float(_player_hp) / float(_max_player_hp)
 	var hp_color: Color = Color.GREEN if hp_ratio > 0.5 else (Color.YELLOW if hp_ratio > 0.25 else Color.RED)
-	draw_rect(Rect2(bar_x, bar_y, bar_w, bar_h), Color(0.2, 0.2, 0.2, 0.6))
-	draw_rect(Rect2(bar_x, bar_y, bar_w * hp_ratio, bar_h), hp_color)
-	for t in _bullet_trails:
-		var a: float = clamp(t.life / 0.15, 0.0, 1.0)
-		draw_line(t.origin, t.end, Color(1, 0.8, 0.2, a), 2)
-	for s in _skill_effects:
-		var a: float = clamp(s.life / 0.5, 0.0, 1.0)
-		draw_arc(s.pos, s.radius, 0, TAU, 36, Color(0.2, 0.6, 1, a), 3)
-	for dp in _death_particles:
-		var a: float = clamp(dp.life / 0.4, 0.0, 1.0)
-		draw_rect(Rect2(dp.pos.x - 3, dp.pos.y - 3, 6, 6), Color(dp.color.r, dp.color.g, dp.color.b, a))
+	draw_rect(Rect2(px.x - bar_w / 2.0, px.y - 30, bar_w, bar_h), Color(0.2, 0.2, 0.2, 0.6))
+	draw_rect(Rect2(px.x - bar_w / 2.0, px.y - 30, bar_w * hp_ratio, bar_h), hp_color)
+	# Enemy HP bars
 	for e in _enemies:
-		if e.hp <= 0: continue
+		if e.hp <= 0:
+			continue
 		var ep: Vector2 = e.rect.position
 		var es: Vector2 = e.rect.size
 		var ratio: float = float(e.hp) / float(e.max_hp)
 		draw_rect(Rect2(ep.x, ep.y - 8, es.x, 4), Color(0.2, 0.2, 0.2, 0.7))
 		draw_rect(Rect2(ep.x, ep.y - 8, es.x * ratio, 4), Color.RED if ratio < 0.5 else Color.GREEN)
+	# Bullet trails
+	for t in _bullet_trails:
+		var a: float = clamp(t.life / 0.15, 0.0, 1.0)
+		draw_line(t.origin, t.end, Color(1, 0.8, 0.2, a), 2)
+	# Skill effects
+	for s in _skill_effects:
+		var a: float = clamp(s.life / 0.5, 0.0, 1.0)
+		draw_arc(s.pos, s.radius, 0, TAU, 36, Color(0.2, 0.6, 1, a), 3)
+	# Enemy bullets
 	for b in _enemy_bullets:
 		draw_circle(b.pos, 3, Color(1, 0.5, 0, 1))
+	# Death particles
+	for dp in _death_particles:
+		var a: float = clamp(dp.life / 0.4, 0.0, 1.0)
+		draw_rect(Rect2(dp.pos.x - 3, dp.pos.y - 3, 6, 6), Color(dp.color.r, dp.color.g, dp.color.b, a))
 
 func _safe_set(node: Node, prop: String, value: Node) -> void:
 	if node and prop in node:
