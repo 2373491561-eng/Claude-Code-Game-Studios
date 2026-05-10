@@ -146,6 +146,9 @@ func _process(delta: float) -> void:
 			if e.hp <= 0: continue
 			var d: float = $Player.global_position.distance_to(e.rect.position + Vector2(12, 12))
 			if d < nearest_dist: nearest_dist = d
+		for b in _enemy_bullets:
+			var bd: float = $Player.global_position.distance_to(b.pos)
+			if bd < nearest_dist: nearest_dist = bd
 		_do_dodge(aim, nearest_dist < 50.0)
 
 	# Skill
@@ -224,6 +227,7 @@ func _do_skill() -> void:
 
 func _do_dodge(aim: Vector2, is_perfect: bool = false) -> void:
 	_is_dodging = true
+	_player_iframe_end = Time.get_ticks_msec() + 500
 	var raw_mx: Vector2 = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	var direction: Vector2
 	if raw_mx.length() > 0.1:
