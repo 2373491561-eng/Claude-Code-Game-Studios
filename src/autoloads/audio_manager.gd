@@ -14,7 +14,6 @@
 ##   AudioManager.crossfade_bgm(AudioManager.BGMState.DEATH, 1.0)
 ##   var current := AudioManager.get_current_bgm()
 ##   [/codeblock]
-class_name AudioManager
 extends Node
 
 # ---------------------------------------------------------------------------

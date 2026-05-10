@@ -33,9 +33,6 @@ func after_each() -> void:
 # Helper
 # ---------------------------------------------------------------------------
 
-## Creates an InputEventKey that will match the dodge action (KEY_SHIFT).
-## Per ADR-0002, dodge detection flows through _input() → _process_dodge(),
-## not via direct Input.action_press("dodge").
 func _make_dodge_press_event() -> InputEventKey:
 	var event := InputEventKey.new()
 	event.keycode = KEY_SHIFT

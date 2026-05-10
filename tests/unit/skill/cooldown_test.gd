@@ -1,11 +1,5 @@
-## Unit tests for SkillSystem: cooldown logic, charge acceleration,
-## dodge CD reduction, CD reduction cap.
 ##
-## Covers: cooldown timer (real time), charge-accelerated cooldown speed,
-## normal dodge CD reduction (-3s), perfect dodge CD reduction (-8s),
-## charge=0 perfect dodge no reduction, CD reduction cap, is_skill1_ready.
 ##
-## Implements GDD AC2a, AC2b, AC2c, AC3a, AC3b, AC3c, AC3d.
 extends GutTest
 
 # ---------------------------------------------------------------------------

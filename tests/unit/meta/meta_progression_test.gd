@@ -1,7 +1,4 @@
-## Unit tests for MetaProgression: points calculation formula, unlock
-## thresholds, and accumulated points logic.
 ##
-## Covers: meta-progression Story all ACs.
 extends GutTest
 
 # ---------------------------------------------------------------------------

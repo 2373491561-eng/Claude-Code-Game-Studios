@@ -1,9 +1,5 @@
-## Unit tests for DodgeSystem: charge regeneration and normal dodge logic.
 ##
-## Covers: charge regen, dodge trigger, charge consumption, direction
-## selection, displacement, invincibility, state transitions.
 ##
-## Implements GDD AC1a, AC1b, AC1c, AC2a, AC6a, AC6b, AC8b, AC11.
 extends GutTest
 
 # ---------------------------------------------------------------------------

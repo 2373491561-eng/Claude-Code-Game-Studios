@@ -18,8 +18,6 @@ extends GutTest
 # Shared references
 # ---------------------------------------------------------------------------
 
-## EventBus node manually added to /root so InputSystem can find it.
-## InputSystem uses get_node_or_null("/root/EventBus") to emit signals.
 var _event_bus: Node
 
 # ---------------------------------------------------------------------------

@@ -1,8 +1,4 @@
-## Unit tests for VFXManager particle pool logic: acquire, release, LRU
-## eviction, reset on release, and expired particle sweeping.
 ##
-## Covers: vfx-particles pool acquire/release/LRU logic only.
-## Visual output is not testable (per testing standards).
 extends GutTest
 
 # ---------------------------------------------------------------------------

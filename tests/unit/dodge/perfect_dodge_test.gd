@@ -1,10 +1,5 @@
-## Unit tests for DodgeSystem: perfect dodge detection and time scale logic.
 ##
-## Covers: perfect dodge distance check, charge consumption (none),
-## time scale setting and recovery, multiple-attack handling,
-## perfect-dodge-during-perfect-dodge ignoring, charge=0 perfect dodge.
 ##
-## Implements GDD AC3a, AC3c, AC3d.
 extends GutTest
 
 # ---------------------------------------------------------------------------

@@ -1,11 +1,5 @@
-## Unit tests for SkillSystem: AoE damage, cancel refund, cast lifecycle,
-## same-frame dodge + skill_1 priority, cancel window timing.
 ##
-## Covers: AoE radius, base damage, cancel refund calculation (75% rounded
-## to 0.1s), cancel window timing (200ms), same-frame cancel priority,
-## non-cancelable phase after 200ms, cooldown reset on cast.
 ##
-## Implements GDD AC1a, AC1b, AC1c, AC7.
 extends GutTest
 
 # ---------------------------------------------------------------------------

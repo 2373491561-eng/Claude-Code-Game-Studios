@@ -1,9 +1,5 @@
-## Unit tests for DamageHealthSystem: HP, iframes, and damage application.
 ##
-## Covers: take_damage with guard checks, iframe timing, invincibility
-## queries, HP clamping, death trigger.
 ##
-## Implements damage-health Story 001 ACs.
 extends GutTest
 
 # ---------------------------------------------------------------------------

@@ -12,7 +12,6 @@
 ##   GameManager.end_run()
 ##   var duration := GameManager.get_run_duration_seconds()
 ##   [/codeblock]
-class_name GameManager
 extends Node
 
 # ---------------------------------------------------------------------------

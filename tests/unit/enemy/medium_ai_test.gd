@@ -1,11 +1,5 @@
-## Unit tests for EnemyManager: medium enemy AI (distance maintenance,
-## retreat/approach, attack windup + bullet, corner behavior, rapid fire,
-## hit stun).
 ##
-## Covers: distance hysteresis, retreat/approach speeds, attack windup,
-## bullet spawn, corner detection, rapid fire, hit stun duration.
 ##
-## Implements enemy-system Story 003 ACs.
 extends GutTest
 
 # ---------------------------------------------------------------------------

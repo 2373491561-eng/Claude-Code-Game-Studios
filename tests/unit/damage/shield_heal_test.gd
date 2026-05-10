@@ -1,9 +1,5 @@
-## Unit tests for DamageHealthSystem: shield absorption and heal logic.
 ##
-## Covers: shield damage absorption, partial absorption, iframe bypass,
-## heal_from_perfect_dodge edge cases, shield expiry.
 ##
-## Implements damage-health Story 002 ACs.
 extends GutTest
 
 # ---------------------------------------------------------------------------

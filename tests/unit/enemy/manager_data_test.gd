@@ -1,11 +1,5 @@
-## Unit tests for EnemyManager: data layout, spawning, rendering, and
-## collision detection queries.
 ##
-## Covers: struct-of-arrays memory layout, spawn_wave, check_bullet_hit,
-## check_player_contact, get_all_attack_positions, apply_damage,
-## death removal, and rendering sync.
 ##
-## Implements enemy-system Story 001 ACs.
 extends GutTest
 
 # ---------------------------------------------------------------------------

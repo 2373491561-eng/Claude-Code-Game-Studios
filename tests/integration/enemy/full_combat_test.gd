@@ -1,10 +1,5 @@
-## Integration tests for EnemyManager: full combat simulation.
 ##
-## Covers: spawning 53 enemies, mixed AI updates, collision detection
-## with player damage pipeline, death removal, all-enemy AI within
-## performance budget, and death freeze.
 ##
-## Implements enemy-system Story 004 (full integration) ACs.
 extends GutTest
 
 # ---------------------------------------------------------------------------

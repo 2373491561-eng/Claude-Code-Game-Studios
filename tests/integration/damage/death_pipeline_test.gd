@@ -1,12 +1,6 @@
-## Integration tests for DamageHealthSystem: full death pipeline.
 ##
-## Covers: take_damage -> death -> input freeze -> EventBus.player_death ->
-## scene transition trigger, and the enemy damage pipeline end-to-end.
 ##
-## Verifies that the death sequence flows correctly across multiple systems
-## without requiring the full scene tree.
 ##
-## Implements damage-health Story 003 ACs.
 extends GutTest
 
 # ---------------------------------------------------------------------------

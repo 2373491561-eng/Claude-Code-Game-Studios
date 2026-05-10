@@ -17,7 +17,6 @@
 ##   SceneManager.switch_to(SceneManager.SceneID.DEATH_SCREEN)
 ##   var current := SceneManager.get_current_scene()
 ##   [/codeblock]
-class_name SceneManager
 extends Node
 
 # ---------------------------------------------------------------------------

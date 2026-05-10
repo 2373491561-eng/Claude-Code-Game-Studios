@@ -1,10 +1,5 @@
-## Integration tests for DodgeSystem: post-dodge overlap resolution.
 ##
-## Covers: spiral search for non-overlapping position, fallback when
-## no space is found within 200px, public API doc comments presence,
-## EventBus signal emission with graceful fallback.
 ##
-## Implements GDD: post-dodge overlap edge case.
 extends GutTest
 
 # ---------------------------------------------------------------------------

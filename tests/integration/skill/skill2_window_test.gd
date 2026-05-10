@@ -1,11 +1,5 @@
-## Integration tests for SkillSystem: skill_2 window logic and orb state.
 ##
-## Covers: skill_2 window opens on perfect dodge (charge>=1), window closes
-## after 500ms, window refreshed by second perfect dodge, consume_skill2()
-## clears window, charge=0 perfect dodge does NOT open window,
-## orb state thresholds (EMPTY, CHARGING, ALMOST_READY, READY).
 ##
-## Implements GDD AC4a, AC4b, AC4c, AC4d, AC5a-AC5d.
 extends GutTest
 
 # ---------------------------------------------------------------------------

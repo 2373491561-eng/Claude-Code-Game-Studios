@@ -1,7 +1,4 @@
-## Unit tests for WaveManager: wave progression table, wave start, wave clear
-## detection, first wave delay, and transition logic.
 ##
-## Covers: wave-management Story all ACs.
 extends GutTest
 
 # ---------------------------------------------------------------------------

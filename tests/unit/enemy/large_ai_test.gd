@@ -1,11 +1,5 @@
-## Unit tests for EnemyManager: large enemy AI (advance, charge windup + dash,
-## melee windup + damage, death explosion, charge dodgeability, no hit stun).
 ##
-## Covers: charge windup timing, dash speed/duration, melee trigger distance,
-## melee windup, damage values, no stun on hit, charge dodgeable by player,
-## multi-stage death explosion.
 ##
-## Implements enemy-system Story 004 ACs.
 extends GutTest
 
 # ---------------------------------------------------------------------------

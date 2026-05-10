@@ -43,7 +43,6 @@ func after_each() -> void:
 # Helper
 # ---------------------------------------------------------------------------
 
-## Creates an InputEventKey that will match the dodge action (KEY_SHIFT).
 func _make_dodge_press_event() -> InputEventKey:
 	var event := InputEventKey.new()
 	event.keycode = KEY_SHIFT

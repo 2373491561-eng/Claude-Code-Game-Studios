@@ -1,10 +1,5 @@
-## Unit tests for EnemyManager: small enemy AI (chase, contact damage,
-## hit cooldown, pushback, separation grid).
 ##
-## Covers: chase speed, contact damage trigger, hit cooldown timing,
-## pushback distance, spatial hash grid separation.
 ##
-## Implements enemy-system Story 002 ACs.
 extends GutTest
 
 # ---------------------------------------------------------------------------
