@@ -5,6 +5,7 @@ var _bullet_trails: Array = []
 var _last_fire_ms: int = 0
 var _hit_count: int = 0
 var _is_dodging: bool = false
+var _dodge_end_ms: int = 0
 var _last_move_dir: Vector2 = Vector2.RIGHT
 
 func _ready() -> void:
@@ -54,8 +55,8 @@ func _process(delta: float) -> void:
 		_fire_bullet(aim)
 	_was_shooting = shoot
 
-	# Dodge — triggered by Shift or Right-click
-	if Input.is_action_just_pressed("dodge") and not _is_dodging:
+	# Dodge — Shift or Right-click, 500ms cooldown after each dodge
+	if Input.is_action_just_pressed("dodge") and not _is_dodging and Time.get_ticks_msec() - _dodge_end_ms > 500:
 		_do_dodge(mx, aim)
 
 	# Bullet trail fade
@@ -67,6 +68,8 @@ func _process(delta: float) -> void:
 
 func _do_dodge(mx: Vector2, aim: Vector2) -> void:
 	_is_dodging = true
+	$Player.set_process(false)
+	$Player.set_physics_process(false)
 	var direction: Vector2
 	if mx.length() > 0.1:
 		direction = mx.normalized()
@@ -88,6 +91,9 @@ func _do_dodge(mx: Vector2, aim: Vector2) -> void:
 	tween.tween_property(player, "global_position", target, 0.3).set_trans(Tween.TRANS_QUAD)
 	tween.tween_callback(func():
 		_is_dodging = false
+		_dodge_end_ms = Time.get_ticks_msec()
+		$Player.set_process(true)
+		$Player.set_physics_process(true)
 		sprite.color = Color(1, 0.3, 0.3, 1)
 	)
 
