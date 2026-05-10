@@ -87,7 +87,7 @@ func _do_dodge(aim: Vector2) -> void:
 	$Player/PlayerSprite.color = Color(0.3, 0.5, 1, 1)
 
 	var tween: Tween = create_tween()
-	tween.tween_property($Player, "global_position", target, 0.3)
+	tween.tween_property($Player, "global_position", target, 0.15)
 	tween.tween_callback(func():
 		_is_dodging = false
 		_dodge_end_ms = Time.get_ticks_msec()
