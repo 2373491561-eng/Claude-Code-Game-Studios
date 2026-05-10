@@ -71,12 +71,14 @@ func _do_dodge(mx: Vector2, aim: Vector2) -> void:
 	$Player.set_process(false)
 	$Player.set_physics_process(false)
 	var direction: Vector2
-	if mx.length() > 0.1:
-		direction = mx.normalized()
-	elif _last_move_dir.length() > 0.1:
+	var raw_mx: Vector2 = Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	if raw_mx.length() > 0.1:
+		direction = raw_mx.normalized()
+	elif _last_move_dir.length() > 0.01:
 		direction = _last_move_dir
 	else:
 		direction = -aim if aim.length() > 0.01 else Vector2.RIGHT
+	print("DODGE: raw=%s last=%s aim=%s -> dir=%s" % [raw_mx, _last_move_dir, aim, direction])
 
 	var player: Node2D = $Player
 	var start: Vector2 = player.global_position
