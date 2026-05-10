@@ -33,6 +33,8 @@ var _enemy_bullets: Array = []
 var _wave_number: int = 1
 var _kill_count: int = 0
 var _showing_upgrades: bool = false
+var _is_dead: bool = false
+var _upgrade_count: int = 0
 var _upgrade_choices: Array = []
 
 # Visual
@@ -85,6 +87,8 @@ func _spawn_wave() -> void:
 # ============================================================
 
 func _process(delta: float) -> void:
+	if _is_dead:
+		return
 	if _showing_upgrades:
 		return
 	var inp: Node = $InputSystem
@@ -307,9 +311,9 @@ func _hurt_player() -> void:
 	var ht: Tween = create_tween()
 	ht.tween_property($Player/PlayerSprite, "color", Color(1, 0.3, 0.3, 1), 0.3)
 	if _player_hp <= 0:
-		_player_iframe_end = Time.get_ticks_msec() + 3000
-		_player_hp = _max_player_hp
-		$Player.global_position = Vector2(480, 400)
+		_player_hp = 0
+		_is_dead = true
+		_show_death_screen()
 
 func _spawn_particles(pos: Vector2, col: Color) -> void:
 	for i in range(8):
@@ -358,7 +362,51 @@ func _show_upgrades() -> void:
 		_upgrade_choices.append(btn)
 	Engine.time_scale = 0.05
 
+
+func _show_death_screen() -> void:
+	Engine.time_scale = 1.0
+	var overlay := ColorRect.new()
+	overlay.color = Color(0, 0, 0, 0.8)
+	overlay.size = Vector2(960, 540)
+	overlay.name = "DeathOverlay"
+	add_child(overlay)
+	var y: float = 180
+	for line in ["YOU DIED!", "Wave: %d" % _wave_number, "Kills: %d" % _kill_count, "Upgrades: %d" % _upgrade_count]:
+		var label := Label.new()
+		label.text = line
+		label.position = Vector2(400, y)
+		label.add_theme_font_size_override("font_size", 24 if y == 180 else 16)
+		label.add_theme_color_override("font_color", Color.RED if y == 180 else Color.WHITE)
+		add_child(label)
+		y += 50
+	var btn := Button.new()
+	btn.text = "RESTART"
+	btn.position = Vector2(420, y + 20)
+	btn.size = Vector2(120, 40)
+	btn.pressed.connect(_restart_game)
+	add_child(btn)
+
+func _restart_game() -> void:
+	_is_dead = false
+	_player_hp = _max_player_hp
+	_wave_number = 1
+	_kill_count = 0
+	_upgrade_count = 0
+	_fire_interval_ms = 125
+	_bonus_damage = 0
+	_max_player_hp = 3
+	_move_speed = 300.0
+	$Player.global_position = Vector2(480, 400)
+	for c in get_children():
+		if c is Label or c is Button or (c is ColorRect and c.name == "DeathOverlay"):
+			c.queue_free()
+	_enemy_bullets.clear()
+	_death_particles.clear()
+	_bullet_trails.clear()
+	_skill_effects.clear()
+	_spawn_wave()
 func _pick_upgrade(id: String) -> void:
+	_upgrade_count += 1
 	for c in _upgrade_choices:
 		c.queue_free()
 	_upgrade_choices.clear()
