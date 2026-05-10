@@ -81,7 +81,7 @@ func _process(delta: float) -> void:
 			var ht: Tween = create_tween()
 			ht.tween_property($Player/PlayerSprite, "color", Color(1, 0.3, 0.3, 1), 0.3)
 			if _player_hp <= 0:
-			_player_iframe_end = Time.get_ticks_msec() + 3000
+				_player_iframe_end = Time.get_ticks_msec() + 3000
 				_player_hp = 3
 				$Player.global_position = Vector2(480, 400)
 				print("YOU DIED!")
