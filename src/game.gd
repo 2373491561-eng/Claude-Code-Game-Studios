@@ -15,6 +15,12 @@ var _enemies: Array = []
 var _enemy_bullets: Array = []
 var _wave_number: int = 1
 var _kill_count: int = 0
+var _upgrade_choices: Array = []
+var _showing_upgrades: bool = false
+var _fire_interval_ms: int = 125
+var _bonus_damage: int = 0
+var _max_player_hp: int = 3
+var _move_speed: float = 300.0
 
 func _ready() -> void:
 	_safe_set($InputSystem, "player_node", $Player)
@@ -73,7 +79,7 @@ func _process(delta: float) -> void:
 
 	# Player movement
 	if not _is_dodging:
-		$Player.global_position += mx * 300.0 * delta
+		$Player.global_position += mx * _move_speed * delta
 
 	# Enemy AI
 	for e in _enemies:
@@ -109,7 +115,7 @@ func _process(delta: float) -> void:
 			ht.tween_property($Player/PlayerSprite, "color", Color(1, 0.3, 0.3, 1), 0.3)
 			if _player_hp <= 0:
 				_player_iframe_end = Time.get_ticks_msec() + 3000
-				_player_hp = 3
+				_player_hp = _max_player_hp
 				$Player.global_position = Vector2(480, 400)
 
 	# Move enemy bullets
@@ -129,12 +135,12 @@ func _process(delta: float) -> void:
 			b.rect.queue_free(); _enemy_bullets.remove_at(i)
 			if _player_hp <= 0:
 				_player_iframe_end = Time.get_ticks_msec() + 3000
-				_player_hp = 3
+				_player_hp = _max_player_hp
 				$Player.global_position = Vector2(480, 400)
 	# Shooting
 	if not _is_dodging:
 		if shoot and not _was_shooting: _last_fire_ms = 0
-		if shoot and Time.get_ticks_msec() - _last_fire_ms >= 125:
+		if shoot and Time.get_ticks_msec() - _last_fire_ms >= _fire_interval_ms:
 			_last_fire_ms = Time.get_ticks_msec()
 			_fire_bullet(aim)
 	_was_shooting = shoot
@@ -201,7 +207,7 @@ func _fire_bullet(aim: Vector2) -> void:
 				closest = e
 	if not closest.is_empty() and closest_dist < 800.0:
 		endpoint = origin + aim * closest_dist
-		closest.hp -= 1
+		closest.hp -= (1 + _bonus_damage)
 		closest.rect.color = Color(1, 0.2, 0.2, 1)
 		if closest.hp <= 0:
 			closest.rect.visible = false
@@ -217,7 +223,7 @@ func _do_skill() -> void:
 	for e in _enemies:
 		if e.hp <= 0: continue
 		if origin.distance_to(e.rect.position + Vector2(12, 12)) < 200.0:
-			e.hp -= 1
+			e.hp -= (1 + _bonus_damage)
 			e.rect.color = Color(1, 0.2, 0.2, 1)
 			if e.hp <= 0:
 				e.rect.visible = false
@@ -262,21 +268,54 @@ func _check_wave_clear() -> void:
 	var alive: int = 0
 	for e in _enemies:
 		if e.hp > 0: alive += 1
-	if alive <= 0:
-		_wave_number += 1
-		_spawn_wave()
+	if alive <= 0 and not _showing_upgrades:
+		_show_upgrades()
 
-func _draw() -> void:
-	for t in _bullet_trails:
-		var a: float = clamp(t.life / 0.15, 0.0, 1.0)
-		draw_line(t.origin, t.end, Color(1, 0.8, 0.2, a), 2)
-	for b in _enemy_bullets:
-		draw_circle(b.pos, 3, Color(0, 0.5, 1, 1))
+func _show_upgrades() -> void:
+	_showing_upgrades = true
+	_upgrade_choices.clear()
+	var pool := [
+		{"name": "Fire Rate +25%", "id": "fire_rate"},
+		{"name": "Damage +1", "id": "damage"},
+		{"name": "Max HP +1", "id": "max_hp"},
+		{"name": "Move Speed +20%", "id": "move_speed"},
+		{"name": "Dodge CD -200ms", "id": "dodge_cd"},
+		{"name": "Skill CD -1s", "id": "skill_cd"},
+	]
+	pool.shuffle()
+	for i in range(3):
+		var opt := pool[i]
+		var btn := Button.new()
+		btn.text = "[%d] %s" % [i + 1, opt.name]
+		btn.position = Vector2(300, 400 + i * 40)
+		btn.size = Vector2(360, 32)
+		btn.pressed.connect(func(): _pick_upgrade(opt.id))
+		add_child(btn)
+		_upgrade_choices.append(btn)
+	var label := Label.new()
+	label.text = "WAVE %d CLEARED! Choose upgrade (1/2/3):" % _wave_number
+	label.position = Vector2(300, 370)
+	label.add_theme_font_size_override("font_size", 14)
+	add_child(label)
+	_upgrade_choices.append(label)
+	Engine.time_scale = 0.05
 
-	for s in _skill_effects:
-		var a: float = clamp(s.life / 0.5, 0.0, 1.0)
-		draw_arc(s.pos, s.radius, 0, TAU, 36, Color(0.2, 0.6, 1, a), 3)
+func _pick_upgrade(id: String) -> void:
+	for c in _upgrade_choices:
+		c.queue_free()
+	_upgrade_choices.clear()
+	_showing_upgrades = false
+	Engine.time_scale = 1.0
+	match id:
+		"fire_rate": _fire_interval_ms = max(50, _fire_interval_ms - 30)
+		"damage": _bonus_damage += 1
+		"max_hp": _player_hp = min(_player_hp + 1, 6); _max_player_hp += 1
+		"move_speed": _move_speed += 60
+		"dodge_cd": _dodge_end_ms = 0
+		"skill_cd": _skill_cooldown_ms = 0
+	_wave_number += 1
+	_spawn_wave()
 
-func _safe_set(node: Node, prop: String, value: Node) -> void:
+func _safe_set
 	if node and prop in node:
 		node.set(prop, value)
