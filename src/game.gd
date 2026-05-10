@@ -34,6 +34,7 @@ var _wave_number: int = 1
 var _kill_count: int = 0
 var _showing_upgrades: bool = false
 var _upgrade_choices: Array = []
+var _death_particles: Array = []
 
 func _ready() -> void:
 	_safe_set($InputSystem, "player_node", $Player)
@@ -178,6 +179,16 @@ func _process(delta: float) -> void:
 			var d: float = $Player.global_position.distance_to(e.rect.position + e.rect.size / 2.0)
 			if d < nearest_dist:
 				nearest_dist = d
+	for dp in _death_particles:
+		var a: float = clamp(dp.life / 0.4, 0.0, 1.0)
+		draw_rect(Rect2(dp.pos.x - 3, dp.pos.y - 3, 6, 6), Color(dp.color.r, dp.color.g, dp.color.b, a))
+	for e in _enemies:
+		if e.hp <= 0: continue
+		var ep: Vector2 = e.rect.position
+		var es: Vector2 = e.rect.size
+		var ratio: float = float(e.hp) / float(e.max_hp)
+		draw_rect(Rect2(ep.x, ep.y - 8, es.x, 4), Color(0.2, 0.2, 0.2, 0.7))
+		draw_rect(Rect2(ep.x, ep.y - 8, es.x * ratio, 4), Color.RED if ratio < 0.5 else Color.GREEN)
 		for b in _enemy_bullets:
 			var bd: float = $Player.global_position.distance_to(b.pos)
 			if bd < nearest_dist:
@@ -224,6 +235,13 @@ func _process(delta: float) -> void:
 		$Player/PlayerSprite.modulate.a = 1.0 if blink > 0 else 0.3
 	elif _player_hp > 0:
 		$Player/PlayerSprite.modulate.a = 1.0
+	# Death particles
+	for i in range(_death_particles.size() - 1, -1, -1):
+		var dp: Dictionary = _death_particles[i]
+		dp.pos += dp.vel * delta
+		dp.life -= delta
+		if dp.life <= 0:
+			_death_particles.remove_at(i)
 	queue_redraw()
 
 # ============================================================
@@ -254,6 +272,7 @@ func _fire_bullet(aim: Vector2) -> void:
 		closest.rect.color = Color(1, 0.2, 0.2, 1)
 		if closest.hp <= 0:
 			closest.rect.visible = false
+				_spawn_particles(closest.rect.position + closest.rect.size / 2.0, closest.rect.color)
 			_kill_count += 1
 			_check_wave_clear()
 		else:
@@ -272,6 +291,7 @@ func _do_skill() -> void:
 			e.rect.color = Color(1, 0.2, 0.2, 1)
 			if e.hp <= 0:
 				e.rect.visible = false
+				_spawn_particles(e.rect.position + e.rect.size / 2.0, e.rect.color)
 				_kill_count += 1
 				_check_wave_clear()
 	_skill_effects.append({"pos": origin, "radius": 0.0, "life": 0.5})
@@ -388,6 +408,12 @@ func _pick_upgrade(id: String) -> void:
 # RENDER
 # ============================================================
 
+
+func _spawn_particles(pos: Vector2, col: Color) -> void:
+	for i in range(8):
+		var angle: float = TAU * float(i) / 8.0
+		var speed: float = randf_range(60.0, 150.0)
+		_death_particles.append({"pos": pos, "vel": Vector2(cos(angle), sin(angle)) * speed, "life": 0.4, "color": col})
 func _draw() -> void:
 	# Player HP bar
 	var px: Vector2 = $Player.global_position
@@ -405,6 +431,16 @@ func _draw() -> void:
 	for s in _skill_effects:
 		var a: float = clamp(s.life / 0.5, 0.0, 1.0)
 		draw_arc(s.pos, s.radius, 0, TAU, 36, Color(0.2, 0.6, 1, a), 3)
+	for dp in _death_particles:
+		var a: float = clamp(dp.life / 0.4, 0.0, 1.0)
+		draw_rect(Rect2(dp.pos.x - 3, dp.pos.y - 3, 6, 6), Color(dp.color.r, dp.color.g, dp.color.b, a))
+	for e in _enemies:
+		if e.hp <= 0: continue
+		var ep: Vector2 = e.rect.position
+		var es: Vector2 = e.rect.size
+		var ratio: float = float(e.hp) / float(e.max_hp)
+		draw_rect(Rect2(ep.x, ep.y - 8, es.x, 4), Color(0.2, 0.2, 0.2, 0.7))
+		draw_rect(Rect2(ep.x, ep.y - 8, es.x * ratio, 4), Color.RED if ratio < 0.5 else Color.GREEN)
 	for b in _enemy_bullets:
 		draw_circle(b.pos, 3, Color(1, 0.5, 0, 1))
 
