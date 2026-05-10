@@ -192,26 +192,18 @@ func _create_gpu_particle(pool_type: int) -> GPUParticles2D:
 			p.amount = 12
 			p.lifetime = 0.3
 			p.modulate = Color(1.0, 0.8, 0.2)  # Orange sparks
-			p.scale_amount_min = 0.5
-			p.scale_amount_max = 1.5
 		PoolType.SKILL_SHOCKWAVE:
 			p.amount = 48
 			p.lifetime = 0.5
 			p.modulate = Color(0.2, 0.6, 1.0)  # Blue shockwave
-			p.scale_amount_min = 0.8
-			p.scale_amount_max = 2.0
 		PoolType.SKILL_CORE:
 			p.amount = 24
 			p.lifetime = 0.4
 			p.modulate = Color(1.0, 0.4, 0.1)  # Orange-red core
-			p.scale_amount_min = 1.0
-			p.scale_amount_max = 3.0
 		PoolType.DEATH_SHATTER:
 			p.amount = 16
 			p.lifetime = 0.6
 			p.modulate = Color(0.8, 0.3, 0.1)  # Red-orange shatter
-			p.scale_amount_min = 0.3
-			p.scale_amount_max = 1.2
 
 	return p
 
