@@ -42,15 +42,23 @@ func _spawn_wave() -> void:
 			e.rect.queue_free()
 	_enemies.clear()
 	var count: int = 2 + _wave_number
+	var px: float = $Player.global_position.x
+	var py: float = $Player.global_position.y
 	for i in range(count):
 		var rect := ColorRect.new()
 		rect.color = Color(0.2, 1, 0.2, 1)
 		rect.size = Vector2(24, 24)
-		var sx: float = $Player.global_position.x; var sy: float = $Player.global_position.y; var ex: float; var ey: float; while true: ex = randi_range(100, 800); ey = randi_range(100, 400); if Vector2(ex - sx, ey - sy).length() > 200.0: break; rect.position = Vector2(ex, ey)
+		var ex: float
+		var ey: float
+		while true:
+			ex = randi_range(100, 800)
+			ey = randi_range(100, 400)
+			if Vector2(ex - px, ey - py).length() > 200.0:
+				break
+		rect.position = Vector2(ex, ey)
 		add_child(rect)
-		_enemies.append({"rect": rect, "hp": 3, "max_hp": 3})
+		_enemies.append({"rect": rect, "hp": 2, "max_hp": 2})
 	print("WAVE %d: %d enemies!" % [_wave_number, _enemies.size()])
-
 func _process(delta: float) -> void:
 	var inp: Node = $InputSystem
 	if not inp:
