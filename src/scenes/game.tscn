@@ -1,15 +1,22 @@
-[gd_scene format=3 uid="uid://dg2"]
+[gd_scene load_steps=2 format=3 uid="uid://dg3"]
+
+[ext_resource type="Script" path="res://src/input/input_system.gd" id="1"]
 
 [node name="Game" type="Node2D"]
 
+[node name="InputSystem" type="Node" parent="."]
+script = ExtResource("1")
+
 [node name="Camera2D" type="Camera2D" parent="."]
 current = true
+position = Vector2(480, 270)
 
-[node name="BG" type="ColorRect" parent="."]
-color = Color(0.1, 0.12, 0.15, 1)
-size = Vector2(960, 540)
+[node name="Player" type="Node2D" parent="."]
+position = Vector2(480, 400)
+
+[node name="Sprite" type="Sprite2D" parent="Player"]
+texture = null
 
 [node name="Label" type="Label" parent="."]
-text = "GAME SCENE - Press Esc"
-position = Vector2(350, 250)
-add_theme_font_size_override = 18
+text = "WASD to move | Mouse to aim | Click to shoot | Shift to dodge | Space for skill"
+position = Vector2(180, 500)
