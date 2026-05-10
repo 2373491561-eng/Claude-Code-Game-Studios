@@ -11,6 +11,8 @@ var _skill_cooldown_ms: int = 0
 var _skill_effects: Array = []
 var _enemy_hp: int = 3
 var _enemy_kills: int = 0
+var _time_scale_recover: float = 1.0
+var _perfect_overlay: ColorRect = null
 
 func _ready() -> void:
 	_safe_set($InputSystem, "player_node", $Player)
@@ -59,7 +61,7 @@ func _process(delta: float) -> void:
 
 	# Dodge
 	if Input.is_action_just_pressed("dodge") and not _is_dodging and Time.get_ticks_msec() - _dodge_end_ms > 500:
-		_do_dodge(aim)
+		var dist: float = $Player.global_position.distance_to($TestEnemy.position + Vector2(24, 24)); _do_dodge(aim, dist < 50.0)
 
 	# Skill — Space key, AoE shockwave
 	if Input.is_action_just_pressed("skill_1") and Time.get_ticks_msec() - _skill_cooldown_ms > 3000:
@@ -67,6 +69,12 @@ func _process(delta: float) -> void:
 		_do_skill()
 
 	# Debug
+	# Time scale recovery from perfect dodge
+	if Engine.time_scale < 1.0:
+		Engine.time_scale = clamp(Engine.time_scale + delta * 4.0, 0.2, 1.0)
+		if Engine.time_scale >= 1.0:
+			Engine.time_scale = 1.0
+			if _perfect_overlay: _perfect_overlay.visible = false
 	var dbg: Label = $DebugLabel
 	if dbg:
 		var skill_ready: bool = Time.get_ticks_msec() - _skill_cooldown_ms > 3000
@@ -85,7 +93,7 @@ func _process(delta: float) -> void:
 			_skill_effects.remove_at(i)
 	queue_redraw()
 
-func _do_dodge(aim: Vector2) -> void:
+func _do_dodge(aim: Vector2, is_perfect: bool = false) -> void:
 	_is_dodging = true
 	var raw_mx: Vector2 = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	var direction: Vector2
@@ -100,7 +108,18 @@ func _do_dodge(aim: Vector2) -> void:
 	var target: Vector2 = start + direction * 100.0
 	print("DODGE: raw=%s dir=%s start=%s target=%s" % [raw_mx, direction, start, target])
 
-	$Player/PlayerSprite.color = Color(0.3, 0.5, 1, 1)
+	if is_perfect:
+		$Player/PlayerSprite.color = Color(0.2, 0.8, 1, 1)
+		Engine.time_scale = 0.2
+		_skill_cooldown_ms = 0
+		if not _perfect_overlay:
+			_perfect_overlay = ColorRect.new()
+			_perfect_overlay.color = Color(0, 0.3, 0.6, 0.3)
+			_perfect_overlay.size = Vector2(960, 540)
+			add_child(_perfect_overlay)
+			_perfect_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_perfect_overlay.visible = true
+	else:
 
 	var tween: Tween = create_tween()
 	tween.tween_property($Player, "global_position", target, 0.15)
