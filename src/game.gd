@@ -135,7 +135,7 @@ func _do_skill() -> void:
 	if enemy:
 		var epos: Vector2 = enemy.position + Vector2(24, 24)
 		if origin.distance_to(epos) < 200.0:
-			enemy.color = Color(1, 0.2, 0.2, 1)
+			enemy.color = Color(1, 0.2, 0.2, 1) if enemy.color.g > 0.5 else Color(0.2, 1, 0.2, 1)
 			_hit_count += 1
 	# Shockwave visual effect (expanding ring)
 	_skill_effects.append({"pos": origin, "radius": 0.0, "life": 0.5})
