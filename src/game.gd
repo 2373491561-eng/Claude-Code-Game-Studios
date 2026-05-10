@@ -9,6 +9,8 @@ var _dodge_end_ms: int = 0
 var _last_move_dir: Vector2 = Vector2.RIGHT
 var _skill_cooldown_ms: int = 0
 var _skill_effects: Array = []
+var _enemy_hp: int = 3
+var _enemy_kills: int = 0
 
 func _ready() -> void:
 	_safe_set($InputSystem, "player_node", $Player)
@@ -68,7 +70,7 @@ func _process(delta: float) -> void:
 	var dbg: Label = $DebugLabel
 	if dbg:
 		var skill_ready: bool = Time.get_ticks_msec() - _skill_cooldown_ms > 3000
-		dbg.text = "Shoot=%s | Dodge=%s | Skill=%s | HIT=%d" % [shoot, _is_dodging, skill_ready, _hit_count]
+		dbg.text = "HP=%d | Kills=%d | Dodge=%s | Skill=%s" % [_enemy_hp, _enemy_kills, _is_dodging, skill_ready]
 
 	# Bullet trails
 	for i in range(_bullet_trails.size() - 1, -1, -1):
@@ -123,8 +125,15 @@ func _fire_bullet(aim: Vector2) -> void:
 			var perp: float = (to_enemy - aim * proj).length()
 			if perp < 24.0:
 				endpoint = origin + aim * proj
-				enemy.color = Color(1, 0.2, 0.2, 1) if enemy.color.g > 0.5 else Color(0.2, 1, 0.2, 1)
 				_hit_count += 1
+				_enemy_hp -= 1
+				enemy.color = Color(1, 0.2, 0.2, 1)
+				if _enemy_hp <= 0:
+					_enemy_kills += 1
+					_respawn_enemy()
+				else:
+					var t := create_tween()
+					t.tween_property(enemy, "color", Color(0.2, 1, 0.2, 1), 0.2)
 
 	_bullet_trails.append({"origin": origin, "end": endpoint, "life": 0.15})
 
@@ -135,8 +144,12 @@ func _do_skill() -> void:
 	if enemy:
 		var epos: Vector2 = enemy.position + Vector2(24, 24)
 		if origin.distance_to(epos) < 200.0:
-			enemy.color = Color(1, 0.2, 0.2, 1) if enemy.color.g > 0.5 else Color(0.2, 1, 0.2, 1)
 			_hit_count += 1
+			_enemy_hp -= 1
+			enemy.color = Color(1, 0.2, 0.2, 1)
+			if _enemy_hp <= 0:
+				_enemy_kills += 1
+				_respawn_enemy()
 	# Shockwave visual effect (expanding ring)
 	_skill_effects.append({"pos": origin, "radius": 0.0, "life": 0.5})
 	print("SKILL!")
@@ -148,6 +161,12 @@ func _draw() -> void:
 	for s in _skill_effects:
 		var a: float = clamp(s.life / 0.5, 0.0, 1.0)
 		draw_arc(s.pos, s.radius, 0, TAU, 36, Color(0.2, 0.6, 1, a), 3)
+
+func _respawn_enemy() -> void:
+	var enemy: ColorRect = $TestEnemy
+	enemy.color = Color(0.2, 1, 0.2, 1)
+	_enemy_hp = 3
+	enemy.position = Vector2(randi_range(100, 800), randi_range(100, 400))
 
 func _safe_set(node: Node, prop: String, value: Node) -> void:
 	if node and prop in node:
