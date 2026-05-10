@@ -1,19 +1,3 @@
-## AudioManager -- Autoload that manages background music with crossfade
-## transitions between BGM states.
-##
-## Owns an AudioStreamPlayer child for BGM playback. Crossfades use
-## [method Tween.set_ignore_time_scale] (per ADR-0001) so transitions
-## are not affected by [member Engine.time_scale].
-##
-## Audio streams must be registered via [method register_bgm_stream] before
-## a BGM state can produce sound. Unregistered states play silence.
-##
-## Usage:
-##   [codeblock]
-##   AudioManager.crossfade_bgm(AudioManager.BGMState.COMBAT, 0.5)
-##   AudioManager.crossfade_bgm(AudioManager.BGMState.DEATH, 1.0)
-##   var current := AudioManager.get_current_bgm()
-##   [/codeblock]
 extends Node
 
 # ---------------------------------------------------------------------------

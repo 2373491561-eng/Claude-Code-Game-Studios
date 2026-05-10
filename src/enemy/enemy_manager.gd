@@ -1,34 +1,3 @@
-## EnemyManager -- centralized struct-of-arrays enemy manager.
-##
-## Implements: enemy-system Story 001 (Manager Data Layout + Rendering),
-##   Story 002 (Small Enemy AI), Story 003 (Medium Enemy AI),
-##   Story 004 (Large Enemy AI + Full Integration)
-## Governed by: ADR-0004 (Centralized Enemy Manager), ADR-0003 (physics 60Hz),
-##   ADR-0005 (event bus signals)
-##
-## All enemy data is stored in parallel arrays (struct-of-arrays) for cache-
-## friendly iteration. AI is updated in a single batch loop in _physics_process().
-## No enemy has its own _process() -- per ADR-0004.
-##
-## Rendering strategy:
-##   - Small (40): MultiMeshInstance2D -- 1 draw call for all instances.
-##   - Medium (10): Array[Sprite2D] object pool.
-##   - Large (3):  Array[Sprite2D] object pool.
-##
-## Collision detection: manual O(N) ray-circle and distance checks instead of
-## physics body queries -- avoids physics server overhead.
-##
-## On player death (EventBus.player_death): all AI processing is frozen.
-##
-## Usage:
-##   [codeblock]
-##   # In game.tscn:
-##   var enemy_mgr := EnemyManager.new()
-##   enemy_mgr.player_node = $Player/PlayerMovement
-##   enemy_mgr.damage_health_system = $Player/DamageHealthSystem
-##   add_child(enemy_mgr)
-##   enemy_mgr.spawn_wave({"small": 10, "medium": 2, "large": 1})
-##   [/codeblock]
 class_name EnemyManager
 extends Node2D
 

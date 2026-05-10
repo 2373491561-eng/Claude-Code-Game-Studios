@@ -1,32 +1,3 @@
-## DamageHealthSystem -- manages player HP, iframes, shield, healing, death,
-## and the enemy damage pipeline.
-##
-## Implements: damage-health Story 001 (HP + Iframes), Story 002 (Shield + Heal),
-##   Story 003 (Death + Enemy Damage Pipeline)
-## Governed by: ADR-0005 (event bus signals), ADR-0001 (real-time timing)
-##
-## Stores HP as int 0..MAX_HP. Iframes use real-time Time.get_ticks_msec()
-## independent of Engine.time_scale. Shield absorbs damage fully before HP.
-## Shield duration is real-time 3s. Death triggers a freeze, signals EventBus,
-## and transitions to DEATH_SCREEN after 500ms.
-##
-## The enemy damage pipeline computes player-to-enemy damage factoring in
-## build bonuses and the skill_2 window multiplier.
-##
-## Usage:
-##   [codeblock]
-##   # In game.tscn, after instancing dodge and skill systems:
-##   var dmg_sys := DamageHealthSystem.new()
-##   dmg_sys.dodge_system = $Player/DodgeSystem
-##   dmg_sys.skill_system = $Player/SkillSystem
-##   dmg_sys.input_system = $InputSystem
-##   player.add_child(dmg_sys)
-##
-##   # Other systems query health:
-##   if dmg_sys.is_alive():
-##       dmg_sys.take_damage(1, enemy_pos)
-##   var hp := dmg_sys.get_hp()
-##   [/codeblock]
 class_name DamageHealthSystem
 extends Node
 

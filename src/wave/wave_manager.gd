@@ -1,24 +1,3 @@
-## WaveManager -- manages wave progression, enemy spawning, and wave clear detection.
-##
-## Implements: wave-management (Feature layer)
-## Governed by: ADR-0005 (event bus signals), ADR-0004 (centralized enemy manager)
-##
-## Wave progression table defines the enemy composition per wave. On wave start,
-## enemies are spawned via EnemyManager.spawn_wave(). Wave clear is detected by
-## counting EnemyManager's active enemies with HP>0 each physics frame, with a
-## fallback signal-based counter.
-##
-## The first wave begins 1s after scene load. After each wave clear, a brief
-## transition period occurs before the next wave, giving the player time to
-## select build upgrades.
-##
-## Usage:
-##   [codeblock]
-##   # In game.tscn:
-##   var wave_mgr := WaveManager.new()
-##   wave_mgr.enemy_manager = $EnemyManager
-##   add_child(wave_mgr)
-##   [/codeblock]
 class_name WaveManager
 extends Node
 

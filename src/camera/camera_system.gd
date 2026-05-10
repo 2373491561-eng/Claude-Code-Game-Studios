@@ -1,33 +1,3 @@
-## CameraSystem -- smooth follow, aim offset, zoom, and 5-level camera shake.
-##
-## A Camera2D subclass that smoothly follows a target node, applies an aim
-## offset so the player can see more in the direction they are aiming,
-## handles mouse-wheel zoom with tweened transitions, and provides a 5-level
-## camera shake system (ADR-0009) triggered via EventBus signals.
-##
-## Camera shake types:
-##   PLAYER_HIT        -- 3px,  100ms, linear
-##   PERFECT_DODGE     -- 5px,  150ms, ease_out
-##   SKILL_BURST       -- 12px, 300ms, ease_out
-##   LARGE_ENEMY_APPEAR-- 8px,  200ms, ease_in_out
-##   DEATH             -- 20px, 500ms, ease_out
-##
-## All shake tweens use set_ignore_time_scale(true) per ADR-0001 so
-## shake timing is unaffected by Engine.time_scale changes.
-##
-## When multiple shakes fire simultaneously, only the strongest (highest
-## intensity) is applied -- shakes do not stack.
-##
-## Usage:
-##   [codeblock]
-##   # In game.tscn, add a CameraSystem node and configure:
-##   camera.follow_target = $Player
-##   camera.limit_left = 0
-##   camera.limit_right = 1920
-##   camera.limit_top = 0
-##   camera.limit_bottom = 1080
-##   camera.zoom_default = Vector2(2.0, 2.0)
-##   [/codeblock]
 class_name CameraSystem
 extends Camera2D
 

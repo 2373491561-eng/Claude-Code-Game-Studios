@@ -1,28 +1,3 @@
-## SkillSystem -- manages skill_1 cooldown, AoE damage, cancel refund, skill_2
-## window, and charge orb visual state.
-##
-## Implements: design/gdd/skill-system.md (all stories)
-## Governed by: ADR-0010 (skill_2 pierce), ADR-0005 (event bus signals)
-##
-## Skill 1 is a time-cooldown circular AoE burst (200px radius) triggered by
-## Space. Its cooldown speed is accelerated by dodge charge count. Dodges
-## reduce the cooldown directly: -3s for normal, -8s for perfect (charge>=1).
-## Skill 1 can be canceled during its 200ms startup window by dodging,
-## refunding 75% of the remaining cooldown.
-##
-## Skill 2 is auto-attach: after a perfect dodge (charge>=1), a 500ms window
-## opens. The next attack during this window automatically gets damage x2
-## and pierce 1. No extra key press required.
-##
-## Usage:
-##   [codeblock]
-##   # In game.tscn, after instancing dodge and input systems:
-##   var skill_sys := SkillSystem.new()
-##   skill_sys.dodge_system = $Player/DodgeSystem
-##   skill_sys.input_system = $InputSystem
-##   skill_sys.enemy_manager = $EnemyManager  # optional, for AoE damage
-##   player.add_child(skill_sys)
-##   [/codeblock]
 class_name SkillSystem
 extends Node2D
 

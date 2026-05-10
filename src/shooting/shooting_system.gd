@@ -1,31 +1,3 @@
-## ShootingSystem -- hitscan bullet firing with manual hit detection.
-##
-## Reads shoot input from InputSystem every physics frame. Fires hitscan bullets
-## at a configurable fire rate. Hit detection is performed via the EnemyManager's
-## manual ray-circle intersection (check_bullet_hit), per ADR-0004 and ADR-0010.
-##
-## Skill_2 Integration (Story 002):
-##   When skill_2 window is open, damage is doubled and the bullet pierces
-##   through the first target to hit a second. Both ray passes execute in the
-##   same _physics_process frame. After processing, skill_2 is consumed.
-##
-## Degradation:
-##   If enemy_manager is null or lacks check_bullet_hit(), hit detection is
-##   silently skipped. If skill_system is null or lacks is_skill2_window_open(),
-##   skill_2 features are skipped. This allows the system to function before
-##   dependent systems are built.
-##
-## Usage:
-##   [codeblock]
-##   # In game.tscn: add ShootingSystem as a child of the Player scene.
-##   $Player/ShootingSystem.input_system = $InputSystem
-##   $Player/ShootingSystem.enemy_manager = $EnemyManager
-##   $Player/ShootingSystem.skill_system = $SkillSystem
-##   $Player/ShootingSystem.player_node = $Player
-##
-##   # Connect to signals for VFX/audio:
-##   $Player/ShootingSystem.bullet_fired.connect(_on_bullet_fired)
-##   [/codeblock]
 class_name ShootingSystem extends Node2D
 
 # ---------------------------------------------------------------------------

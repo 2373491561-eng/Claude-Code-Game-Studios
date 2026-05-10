@@ -1,28 +1,3 @@
-## AudioSystem -- manages audio buses, SFX playback, ducking, and time-scale pitch.
-##
-## This node is owned by game.tscn. It creates and manages 8 audio buses
-## via AudioServer, plays one-shot SFX on the appropriate bus with a pool of
-## AudioStreamPlayer nodes, handles ducking during skill bursts (ADR-0008),
-## and applies pitch modulation on perfect dodge (ADR-0007 time-scale effect).
-##
-## Ducking timeline: Attack 50ms -> Hold 450ms -> Release 500ms (ease-out).
-## All ducking tweens use set_ignore_time_scale(true) per ADR-0001.
-##
-## Continuous fire: a dedicated looping AudioStreamPlayer starts on the first
-## bullet_hit signal and stops when bullet_hit signals cease (timeout-based
-## release detection).
-##
-## Usage:
-##   [codeblock]
-##   # In game.tscn _ready():
-##   var audio_sys := $AudioSystem
-##   audio_sys.set_shoot_loop_stream(preloaded("res://assets/audio/shoot_loop.tres"))
-##
-##   # Playing a one-shot SFX:
-##   audio_sys.play_sfx("SFX/Weapon", some_stream)
-##
-##   # Ducking triggers automatically via EventBus.skill_1_cast signal.
-##   [/codeblock]
 class_name AudioSystem
 extends Node
 

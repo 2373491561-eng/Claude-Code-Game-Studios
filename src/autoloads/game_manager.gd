@@ -1,17 +1,3 @@
-## GameManager -- Autoload that owns all per-run state.
-##
-## Survives scene changes so RunState persists across
-## MAIN_MENU -> GAME -> DEATH_SCREEN -> MAIN_MENU flow.
-## current_run is null until start_new_run() is called and becomes null again
-## when the run is discarded (e.g., returning to main menu after death screen).
-##
-## Usage:
-##   [codeblock]
-##   GameManager.start_new_run()
-##   GameManager.record_kill()
-##   GameManager.end_run()
-##   var duration := GameManager.get_run_duration_seconds()
-##   [/codeblock]
 extends Node
 
 # ---------------------------------------------------------------------------

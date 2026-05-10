@@ -1,24 +1,3 @@
-## EventBus -- global signal bus for cross-system event communication.
-##
-## This is an Autoload (registered in project.godot) that carries all
-## cross-system signals per ADR-0005. Core systems emit signals here;
-## Presentation systems connect to them. This decouples Core from
-## Presentation -- Core never calls Presentation code directly.
-##
-## Usage:
-##   [codeblock]
-##   # Emitting (in a Core system):
-##   EventBus.game_paused.emit()
-##
-##   # Connecting (in a Presentation system):
-##   EventBus.game_paused.connect(_on_game_paused)
-##   [/codeblock]
-##
-## Signal naming convention: snake_case past tense (e.g., game_paused).
-##
-## Full signal list is defined in ADR-0005. Only the game_paused and
-## game_resumed signals are defined here initially; additional signals
-## will be added as they are needed by implemented systems.
 extends Node
 
 ## Emitted when the game is paused (Esc pressed or focus loss).

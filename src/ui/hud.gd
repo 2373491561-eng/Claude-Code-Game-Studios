@@ -1,22 +1,3 @@
-## HUD -- screen-space wave counter and kill counter overlay.
-##
-## Implements: hud (Presentation layer)
-## Story type: UI (no automated tests -- manual walkthrough)
-##
-## Displays "WAVE X" at top-left and "x N" kill counter at top-right.
-## Opacity strategy: normal 50%, info change pulses to 85% for 0.5s,
-## skill burst dims to 20% for 0.5s.
-##
-## Reads from WaveManager.get_current_wave() and GameManager.current_run.kills.
-## Connects to EventBus.skill_1_cast for opacity dimming.
-##
-## Usage:
-##   [codeblock]
-##   # In game.tscn, added to the scene root:
-##   var hud := HUD.new()
-##   hud.wave_manager = $WaveManager
-##   add_child(hud)
-##   [/codeblock]
 class_name HUD
 extends CanvasLayer
 

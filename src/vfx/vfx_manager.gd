@@ -1,21 +1,3 @@
-## VFXManager -- manages pre-allocated particle pools and screen effects.
-##
-## Implements: vfx-particles (Presentation layer)
-## Governed by: ADR-0013 (VFX particle pool architecture), ADR-0005 (event bus signals)
-##
-## Provides 6 particle pools (bullet_trail, hit_spark, dodge_afterimage,
-## skill_shockwave, skill_core, death_shatter) totaling 312 pre-allocated nodes.
-## Pools use a simple Array[Node2D] acquire/release pattern with LRU eviction
-## on pool exhaustion. Particles update speed_scale from Engine.time_scale.
-##
-## Screen effects (vignette, cold filter) are managed here as ColorRect nodes.
-##
-## Usage:
-##   [codeblock]
-##   # In game.tscn:
-##   var vfx_mgr := VFXManager.new()
-##   add_child(vfx_mgr)
-##   [/codeblock]
 class_name VFXManager
 extends Node2D
 

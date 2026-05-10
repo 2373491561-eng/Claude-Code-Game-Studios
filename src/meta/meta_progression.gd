@@ -1,23 +1,3 @@
-## MetaProgression -- tracks accumulated points across runs, calculates points
-## per run on player death, and unlocks upgrades at threshold milestones.
-##
-## Implements: meta-progression (Feature layer)
-## Governed by: ADR-0005 (event bus signals), ADR-0014 (save system)
-##
-## Points are calculated as: floor(kills * 0.1 + wave_reached * 1.0)
-## on each player death. These are added to the total accumulated points.
-## Unlock thresholds are checked against total accumulated points, and new
-## unlocks are added to the BuildSystem's available pool.
-##
-## State is persisted via SaveManager (duck-typed -- works without it in memory).
-##
-## Usage:
-##   [codeblock]
-##   # Registered as an Autoload or added to game.tscn:
-##   var meta := MetaProgression.new()
-##   meta.build_system = $BuildSystem
-##   add_child(meta)
-##   [/codeblock]
 class_name MetaProgression
 extends Node
 

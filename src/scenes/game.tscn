@@ -1,10 +1,15 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://dtest3"]
 
 [node name="Game" type="Node2D"]
 
 [node name="Camera2D" type="Camera2D" parent="."]
 current = true
 
+[node name="ColorRect" type="ColorRect" parent="."]
+color = Color(0.1, 0.2, 0.4, 1)
+size = Vector2(200, 100)
+position = Vector2(380, 220)
+
 [node name="Label" type="Label" parent="."]
-text = "GAME RUNNING"
-position = Vector2(400, 250)
+text = "GAME RUNNING - Press Esc to quit"
+position = Vector2(340, 250)

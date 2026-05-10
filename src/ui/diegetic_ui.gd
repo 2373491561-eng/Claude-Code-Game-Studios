@@ -1,28 +1,3 @@
-## DiegeticUI -- in-world player status indicators rendered around the player.
-##
-## Implements: diegetic-ui (Presentation layer)
-## Story type: Visual/Feel (no automated tests)
-##
-## Three diegetic indicators orbit the player:
-##   1. Health halo: segmented circle showing current HP / max HP.
-##      On damage: segments shatter outward. On heal: segments fade in.
-##   2. Skill charge orb: circle at offset (0, -30). Color/glow indicates
-##      OrbState (EMPTY, CHARGING, ALMOST_READY, READY).
-##   3. Dodge dots: 3 dots on 28px orbit ring. Available=cyan pulse,
-##      cooling=gray. Consumed: white flash+shrink.
-##
-## Reads systems directly via @export refs. Rendered via _draw() with arcs
-## and circles. z_index control for render order.
-##
-## Usage:
-##   [codeblock]
-##   # In game.tscn, as a child of the Player node:
-##   var diegetic := DiegeticUI.new()
-##   diegetic.damage_health_system = $Player/DamageHealthSystem
-##   diegetic.skill_system = $Player/SkillSystem
-##   diegetic.dodge_system = $Player/DodgeSystem
-##   player.add_child(diegetic)
-##   [/codeblock]
 class_name DiegeticUI
 extends Node2D
 

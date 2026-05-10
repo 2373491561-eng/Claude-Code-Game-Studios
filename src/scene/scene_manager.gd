@@ -1,22 +1,3 @@
-## SceneManager -- Autoload that handles scene transitions with fade effects.
-##
-## Manages the 3-scene flow: MAIN_MENU -> GAME -> DEATH_SCREEN -> MAIN_MENU.
-## Includes a 500ms debounce to prevent rapid-fire scene switches (per ADR-0006)
-## and black fade-in/fade-out transitions for visual polish.
-##
-## On switch to GAME: calls [method GameManager.start_new_run].
-## On switch to DEATH_SCREEN: stores GameManager.current_run stats for the
-## death screen to display via [method get_pending_death_data].
-##
-## SceneManager must be an Autoload because [method SceneTree.change_scene_to_file]
-## removes all non-autoload nodes from the tree.
-##
-## Usage:
-##   [codeblock]
-##   SceneManager.switch_to(SceneManager.SceneID.GAME)
-##   SceneManager.switch_to(SceneManager.SceneID.DEATH_SCREEN)
-##   var current := SceneManager.get_current_scene()
-##   [/codeblock]
 extends Node
 
 # ---------------------------------------------------------------------------

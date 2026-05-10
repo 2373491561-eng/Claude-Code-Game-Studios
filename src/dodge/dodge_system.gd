@@ -1,32 +1,3 @@
-## DodgeSystem -- manages dodge charge, displacement, invincibility, perfect
-## dodge detection, and time scale manipulation.
-##
-## Implements: design/gdd/dodge-system.md (all stories)
-## Governed by: ADR-0007 (perfect dodge detection), ADR-0005 (event bus signals)
-##
-## Dodge is the soul of Rift Reaction. It is both a survival tool and an
-## offensive engine: normal dodges consume charge for invincibility frames,
-## perfect dodges (triggered when an enemy attack is within 40px) do not
-## consume charge and grant time scale slowdown, heal, shield, skill CD
-## reduction, and open the skill_2 window.
-##
-## This system integrates with InputSystem for dodge triggers, PlayerMovement
-## for displacement and collision, and EventBus for cross-system signaling.
-##
-## Usage:
-##   [codeblock]
-##   # In game.tscn, after instancing the player:
-##   var dodge_sys := DodgeSystem.new()
-##   dodge_sys.input_system = $InputSystem
-##   dodge_sys.player_movement = $Player/PlayerMovement
-##   dodge_sys.enemy_manager = $EnemyManager  # optional, for perfect dodge
-##   player.add_child(dodge_sys)
-##
-##   # Other systems query dodge state:
-##   if dodge_sys.is_invincible():
-##       # skip damage
-##   var charges := dodge_sys.get_charge_count()
-##   [/codeblock]
 class_name DodgeSystem
 extends Node2D
 

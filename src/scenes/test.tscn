@@ -1,0 +1,17 @@
+[gd_scene format=3]
+
+[node name="Test" type="Node2D"]
+
+[node name="BG" type="ColorRect" parent="."]
+color = Color(0.1, 0.15, 0.3, 1)
+size = Vector2(960, 540)
+
+[node name="Title" type="Label" parent="."]
+text = "RIFT REACTION - TEST"
+position = Vector2(330, 240)
+add_theme_font_size_override = 24
+
+[node name="Subtitle" type="Label" parent="."]
+text = "If you can read this, Godot works!"
+position = Vector2(310, 280)
+add_theme_font_size_override = 14
