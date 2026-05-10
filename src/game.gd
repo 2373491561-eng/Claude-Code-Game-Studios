@@ -57,7 +57,7 @@ func _spawn_wave() -> void:
 				break
 		rect.position = Vector2(ex, ey)
 		add_child(rect)
-		_enemies.append({"rect": rect, "hp": 2, "max_hp": 2})
+		_enemies.append({"rect": rect, "hp": 3, "max_hp": 3})
 	print("WAVE %d: %d enemies!" % [_wave_number, _enemies.size()])
 func _process(delta: float) -> void:
 	var inp: Node = $InputSystem
