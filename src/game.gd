@@ -49,8 +49,8 @@ func _fire_bullet(aim: Vector2) -> void:
 
 	var enemy: ColorRect = $TestEnemy
 	if enemy:
-		var epos: Vector2 = enemy.global_position
-		var esize: float = 12.0
+		var epos: Vector2 = enemy.global_position + enemy.size / 2.0
+		var esize: float = enemy.size.x / 2.0
 		var to_enemy: Vector2 = epos - origin
 		var proj: float = to_enemy.dot(aim)
 		if proj > 0 and proj < 800.0:
