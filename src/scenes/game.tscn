@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://dg4"]
+[gd_scene load_steps=14 format=3 uid="uid://dg6"]
 
 [ext_resource type="Script" path="res://src/game.gd" id="0"]
 [ext_resource type="Script" path="res://src/input/input_system.gd" id="1"]
@@ -26,6 +26,11 @@ position = Vector2(480, 270)
 
 [node name="Player" type="Node2D" parent="."]
 position = Vector2(480, 400)
+
+[node name="PlayerSprite" type="ColorRect" parent="Player"]
+color = Color(1, 0.3, 0.3, 1)
+size = Vector2(20, 20)
+position = Vector2(-10, -10)
 
 [node name="PlayerMovement" type="CharacterBody2D" parent="Player"]
 script = ExtResource("2")
@@ -56,3 +61,12 @@ script = ExtResource("11")
 
 [node name="HUD" type="CanvasLayer" parent="."]
 script = ExtResource("12")
+
+[node name="TestEnemy" type="ColorRect" parent="."]
+color = Color(0.3, 0.8, 0.3, 1)
+size = Vector2(24, 24)
+position = Vector2(200, 300)
+
+[node name="DebugLabel" type="Label" parent="."]
+text = "Red=You | Green=Enemy | WASD=Move | Click=Shoot | Shift=Dodge | Space=Skill"
+position = Vector2(160, 510)
