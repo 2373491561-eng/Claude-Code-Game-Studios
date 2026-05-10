@@ -37,66 +37,63 @@ func _process(delta: float) -> void:
 	var shoot: bool = inp.is_shoot_pressed()
 	var aim: Vector2 = inp.get_aim_direction()
 
-	# Debug display
-	var dbg: Label = $DebugLabel
-	if dbg:
-		var dodge_text: String = " DODGING!" if _is_dodging else ""
-		dbg.text = "WASD | Click=Shoot | Shift=Dodge | HIT=%d%s" % [_hit_count, dodge_text]
-
-	# Cache last move direction
 	if mx.length() > 0.1:
 		_last_move_dir = mx.normalized()
 
 	# Shooting
-	if shoot and not _was_shooting:
-		_last_fire_ms = 0
-	if shoot and Time.get_ticks_msec() - _last_fire_ms >= 125:
-		_last_fire_ms = Time.get_ticks_msec()
-		_fire_bullet(aim)
+	if not _is_dodging:
+		if shoot and not _was_shooting:
+			_last_fire_ms = 0
+		if shoot and Time.get_ticks_msec() - _last_fire_ms >= 125:
+			_last_fire_ms = Time.get_ticks_msec()
+			_fire_bullet(aim)
 	_was_shooting = shoot
 
-	# Dodge — Shift or Right-click, 500ms cooldown after each dodge
+	# Dodge
 	if Input.is_action_just_pressed("dodge") and not _is_dodging and Time.get_ticks_msec() - _dodge_end_ms > 500:
-		_do_dodge(mx, aim)
+		_do_dodge(aim)
 
-	# Bullet trail fade
+	# Debug
+	var dbg: Label = $DebugLabel
+	if dbg:
+		dbg.text = "Shoot=%s | Dodge=%s | HIT=%d" % [shoot, _is_dodging, _hit_count]
+
+	# Bullet trails
 	for i in range(_bullet_trails.size() - 1, -1, -1):
 		_bullet_trails[i].life -= delta
 		if _bullet_trails[i].life <= 0:
 			_bullet_trails.remove_at(i)
 	queue_redraw()
 
-func _do_dodge(mx: Vector2, aim: Vector2) -> void:
+func _do_dodge(aim: Vector2) -> void:
 	_is_dodging = true
-	$Player.set_process(false)
-	$Player.set_physics_process(false)
-	var direction: Vector2
 	var raw_mx: Vector2 = Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	var direction: Vector2
 	if raw_mx.length() > 0.1:
 		direction = raw_mx.normalized()
 	elif _last_move_dir.length() > 0.01:
 		direction = _last_move_dir
 	else:
 		direction = -aim if aim.length() > 0.01 else Vector2.RIGHT
-	print("DODGE: raw=%s last=%s aim=%s -> dir=%s" % [raw_mx, _last_move_dir, aim, direction])
 
-	var player: Node2D = $Player
-	var start: Vector2 = player.global_position
+	var player: CharacterBody2D = $Player as CharacterBody2D
+	if player:
+		player.velocity = Vector2.ZERO
+
+	var start: Vector2 = $Player.global_position
 	var target: Vector2 = start + direction * 100.0
+	print("DODGE: raw=%s dir=%s start=%s target=%s" % [raw_mx, direction, start, target])
 
-	# Visual: turn blue during dodge
-	var sprite: ColorRect = $Player/PlayerSprite
-	sprite.color = Color(0.3, 0.5, 1, 1)
+	$Player/PlayerSprite.color = Color(0.3, 0.5, 1, 1)
 
-	# Tween animation
 	var tween: Tween = create_tween()
-	tween.tween_property(player, "global_position", target, 0.3).set_trans(Tween.TRANS_QUAD)
+	tween.tween_property($Player, "global_position", target, 0.3)
 	tween.tween_callback(func():
 		_is_dodging = false
 		_dodge_end_ms = Time.get_ticks_msec()
-		$Player.set_process(true)
-		$Player.set_physics_process(true)
-		sprite.color = Color(1, 0.3, 0.3, 1)
+		$Player/PlayerSprite.color = Color(1, 0.3, 0.3, 1)
+		if player:
+			player.velocity = Vector2.ZERO
 	)
 
 func _fire_bullet(aim: Vector2) -> void:
