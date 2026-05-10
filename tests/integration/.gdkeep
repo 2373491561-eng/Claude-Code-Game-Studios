@@ -1,0 +1,2 @@
+# Integration tests directory — GUT (Godot Unit Testing)
+# Test files: tests/integration/[system]/test_[scenario].gd

@@ -1,8 +1,14 @@
 # Godot — Breaking Changes
 
-Last verified: 2026-02-12
+Last verified: 2026-05-07 | Engine: Godot 4.6.2
 
 Changes between Godot versions, focused on post-LLM-cutoff changes (4.4+).
+
+## 4.6 → 4.6.2 (Apr 2026 — Maintenance)
+
+Bug fixes and stability only. No new breaking changes. Safe for existing 4.6 projects.
+
+---
 
 ## 4.5 → 4.6 (Jan 2026 — POST-CUTOFF, HIGH RISK)
 

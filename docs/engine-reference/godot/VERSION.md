@@ -2,16 +2,16 @@
 
 | Field | Value |
 |-------|-------|
-| **Engine Version** | Godot 4.6 |
-| **Release Date** | January 2026 |
-| **Project Pinned** | 2026-02-12 |
-| **Last Docs Verified** | 2026-02-12 |
+| **Engine Version** | Godot 4.6.2 |
+| **Release Date** | April 1, 2026 |
+| **Project Pinned** | 2026-05-07 |
+| **Last Docs Verified** | 2026-05-07 |
 | **LLM Knowledge Cutoff** | May 2025 |
 
 ## Knowledge Gap Warning
 
 The LLM's training data likely covers Godot up to ~4.3. Versions 4.4, 4.5,
-and 4.6 introduced significant changes that the model does NOT know about.
+4.6, and 4.6.2 introduced significant changes that the model does NOT know about.
 Always cross-reference this directory before suggesting Godot API calls.
 
 ## Post-Cutoff Version Timeline
@@ -21,6 +21,7 @@ Always cross-reference this directory before suggesting Godot API calls.
 | 4.4 | ~Mid 2025 | MEDIUM | Jolt physics option, FileAccess return types, shader texture type changes |
 | 4.5 | ~Late 2025 | HIGH | Accessibility (AccessKit), variadic args, @abstract, shader baker, SMAA |
 | 4.6 | Jan 2026 | HIGH | Jolt default, glow rework, D3D12 default on Windows, IK restored |
+| 4.6.2 | Apr 2026 | HIGH | Maintenance release — bug fixes and stability on top of 4.6 |
 
 ## Verified Sources
 

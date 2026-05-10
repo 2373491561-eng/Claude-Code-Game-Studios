@@ -1,0 +1,56 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/player.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/enemy.gd" id="2"]
+[ext_resource type="Script" path="res://scripts/main.gd" id="3"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("3")
+
+[node name="Player" type="CharacterBody2D" parent="."]
+position = Vector2(480, 270)
+script = ExtResource("1")
+
+[node name="Sprite" type="ColorRect" parent="Player"]
+position = Vector2(-16, -16)
+size = Vector2(32, 32)
+color = Color(0.2, 0.6, 0.2, 1)
+
+[node name="Collision" type="CollisionShape2D" parent="Player"]
+shape = SubResource("CircleShape2D_player")
+
+[node name="ScreenOverlay" type="ColorRect" parent="Player"]
+size = Vector2(960, 540)
+color = Color(0, 0, 0, 0)
+mouse_filter = 2
+
+[node name="ChargeLabel" type="Label" parent="Player"]
+position = Vector2(-460, -250)
+text = "闪避充能: 3/3"
+add_theme_color_override("font_color", Color(0.3, 0.8, 0.9, 1))
+
+[node name="StatusLabel" type="Label" parent="Player"]
+position = Vector2(-460, -230)
+text = ""
+add_theme_color_override("font_color", Color(0.9, 0.3, 0.1, 1))
+
+[node name="Enemy" type="CharacterBody2D" parent="."]
+position = Vector2(600, 270)
+script = ExtResource("2")
+
+[node name="Sprite" type="ColorRect" parent="Enemy"]
+position = Vector2(-24, -24)
+size = Vector2(48, 48)
+color = Color(0.7, 0.2, 0.2, 1)
+
+[node name="Collision" type="CollisionShape2D" parent="Enemy"]
+shape = SubResource("CircleShape2D_enemy")
+
+[node name="ShootPos" type="Marker2D" parent="Enemy"]
+position = Vector2(0, 0)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_player"]
+radius = 16.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_enemy"]
+radius = 24.0
