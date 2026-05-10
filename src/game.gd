@@ -34,11 +34,15 @@ func _process(delta: float) -> void:
 		return
 
 	var mx: Vector2 = inp.get_move_axis()
+	if mx.length() > 1.0:
+		mx = mx.normalized()
 	var shoot: bool = inp.is_shoot_pressed()
 	var aim: Vector2 = inp.get_aim_direction()
 
 	if mx.length() > 0.1:
 		_last_move_dir = mx.normalized()
+		if not _is_dodging:
+			$Player.global_position += mx * 300.0 * delta
 
 	# Shooting
 	if not _is_dodging:
@@ -76,10 +80,6 @@ func _do_dodge(aim: Vector2) -> void:
 	else:
 		direction = -aim if aim.length() > 0.01 else Vector2.RIGHT
 
-	var player: CharacterBody2D = $Player as CharacterBody2D
-	if player:
-		player.velocity = Vector2.ZERO
-
 	var start: Vector2 = $Player.global_position
 	var target: Vector2 = start + direction * 100.0
 	print("DODGE: raw=%s dir=%s start=%s target=%s" % [raw_mx, direction, start, target])
@@ -92,8 +92,6 @@ func _do_dodge(aim: Vector2) -> void:
 		_is_dodging = false
 		_dodge_end_ms = Time.get_ticks_msec()
 		$Player/PlayerSprite.color = Color(1, 0.3, 0.3, 1)
-		if player:
-			player.velocity = Vector2.ZERO
 	)
 
 func _fire_bullet(aim: Vector2) -> void:

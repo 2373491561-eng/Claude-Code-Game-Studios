@@ -24,9 +24,8 @@ script = ExtResource("1")
 current = true
 position = Vector2(480, 270)
 
-[node name="Player" type="CharacterBody2D" parent="."]
+[node name="Player" type="Node2D" parent="."]
 position = Vector2(480, 400)
-script = ExtResource("2")
 
 [node name="PlayerSprite" type="ColorRect" parent="Player"]
 color = Color(1, 0.3, 0.3, 1)
