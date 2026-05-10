@@ -272,7 +272,7 @@ func _fire_bullet(aim: Vector2) -> void:
 		closest.rect.color = Color(1, 0.2, 0.2, 1)
 		if closest.hp <= 0:
 			closest.rect.visible = false
-				_spawn_particles(closest.rect.position + closest.rect.size / 2.0, closest.rect.color)
+			_spawn_particles(closest.rect.position + closest.rect.size / 2.0, closest.rect.color)
 			_kill_count += 1
 			_check_wave_clear()
 		else:
