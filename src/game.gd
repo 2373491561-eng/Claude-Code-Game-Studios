@@ -7,6 +7,8 @@ var _hit_count: int = 0
 var _is_dodging: bool = false
 var _dodge_end_ms: int = 0
 var _last_move_dir: Vector2 = Vector2.RIGHT
+var _skill_cooldown_ms: int = 0
+var _skill_effects: Array = []
 
 func _ready() -> void:
 	_safe_set($InputSystem, "player_node", $Player)
@@ -57,16 +59,28 @@ func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("dodge") and not _is_dodging and Time.get_ticks_msec() - _dodge_end_ms > 500:
 		_do_dodge(aim)
 
+	# Skill — Space key, AoE shockwave
+	if Input.is_action_just_pressed("skill_1") and Time.get_ticks_msec() - _skill_cooldown_ms > 3000:
+		_skill_cooldown_ms = Time.get_ticks_msec()
+		_do_skill()
+
 	# Debug
 	var dbg: Label = $DebugLabel
 	if dbg:
-		dbg.text = "Shoot=%s | Dodge=%s | HIT=%d" % [shoot, _is_dodging, _hit_count]
+		var skill_ready: bool = Time.get_ticks_msec() - _skill_cooldown_ms > 3000
+		dbg.text = "Shoot=%s | Dodge=%s | Skill=%s | HIT=%d" % [shoot, _is_dodging, skill_ready, _hit_count]
 
 	# Bullet trails
 	for i in range(_bullet_trails.size() - 1, -1, -1):
 		_bullet_trails[i].life -= delta
 		if _bullet_trails[i].life <= 0:
 			_bullet_trails.remove_at(i)
+	# Skill effects
+	for i in range(_skill_effects.size() - 1, -1, -1):
+		_skill_effects[i].life -= delta
+		_skill_effects[i].radius += 400.0 * delta
+		if _skill_effects[i].life <= 0:
+			_skill_effects.remove_at(i)
 	queue_redraw()
 
 func _do_dodge(aim: Vector2) -> void:
@@ -114,10 +128,26 @@ func _fire_bullet(aim: Vector2) -> void:
 
 	_bullet_trails.append({"origin": origin, "end": endpoint, "life": 0.15})
 
+func _do_skill() -> void:
+	var origin: Vector2 = $Player.global_position
+	# Hit all enemies within 200px
+	var enemy: ColorRect = $TestEnemy
+	if enemy:
+		var epos: Vector2 = enemy.position + Vector2(24, 24)
+		if origin.distance_to(epos) < 200.0:
+			enemy.color = Color(1, 0.2, 0.2, 1)
+			_hit_count += 1
+	# Shockwave visual effect (expanding ring)
+	_skill_effects.append({"pos": origin, "radius": 0.0, "life": 0.5})
+	print("SKILL!")
+
 func _draw() -> void:
 	for t in _bullet_trails:
 		var a: float = clamp(t.life / 0.15, 0.0, 1.0)
 		draw_line(t.origin, t.end, Color(1, 0.8, 0.2, a), 2)
+	for s in _skill_effects:
+		var a: float = clamp(s.life / 0.5, 0.0, 1.0)
+		draw_arc(s.pos, s.radius, 0, TAU, 36, Color(0.2, 0.6, 1, a), 3)
 
 func _safe_set(node: Node, prop: String, value: Node) -> void:
 	if node and prop in node:
