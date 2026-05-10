@@ -59,11 +59,6 @@ script = ExtResource("11")
 [node name="HUD" type="CanvasLayer" parent="."]
 script = ExtResource("12")
 
-[node name="TestEnemy" type="ColorRect" parent="."]
-color = Color(0.3, 0.8, 0.3, 1)
-size = Vector2(24, 24)
-position = Vector2(200, 300)
-
 [node name="DebugLabel" type="Label" parent="."]
 text = "Red=You | Green=Enemy | WASD=Move | Click=Shoot | Shift=Dodge | Space=Skill"
 position = Vector2(160, 510)

@@ -1,0 +1,30 @@
+var _enemies: Array = []
+var _wave_number: int = 1
+
+func _spawn_wave() -> void:
+	for e in _enemies:
+		if is_instance_valid(e.rect):
+			e.rect.queue_free()
+	_enemies.clear()
+	var count: int = 2 + _wave_number
+	for i in range(count):
+		var rect := ColorRect.new()
+		rect.color = Color(0.2, 1, 0.2, 1)
+		rect.size = Vector2(24, 24)
+		rect.position = Vector2(randi_range(100, 800), randi_range(100, 400))
+		add_child(rect)
+		_enemies.append({"rect": rect, "hp": 3, "max_hp": 3})
+	print("WAVE %d: %d enemies!" % [_wave_number, count])
+
+func _find_closest_enemy(origin: Vector2) -> Dictionary:
+	var best: Dictionary = {}
+	var best_dist: float = 99999.0
+	for e in _enemies:
+		if e.hp <= 0:
+			continue
+		var ctr: Vector2 = e.rect.position + Vector2(12, 12)
+		var d: float = origin.distance_squared_to(ctr)
+		if d < best_dist:
+			best_dist = d
+			best = e
+	return best
