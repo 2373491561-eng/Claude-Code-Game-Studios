@@ -218,6 +218,12 @@ func _process(delta: float) -> void:
 		_skill_effects[i].radius += 400.0 * delta
 		if _skill_effects[i].life <= 0:
 			_skill_effects.remove_at(i)
+	# Iframe blink
+	if Time.get_ticks_msec() < _player_iframe_end:
+		var blink: float = sin(Time.get_ticks_msec() * 0.02)
+		$Player/PlayerSprite.modulate.a = 1.0 if blink > 0 else 0.3
+	elif _player_hp > 0:
+		$Player/PlayerSprite.modulate.a = 1.0
 	queue_redraw()
 
 # ============================================================
@@ -383,6 +389,16 @@ func _pick_upgrade(id: String) -> void:
 # ============================================================
 
 func _draw() -> void:
+	# Player HP bar
+	var px: Vector2 = $Player.global_position
+	var bar_w: float = 40.0
+	var bar_h: float = 5.0
+	var bar_x: float = px.x - bar_w / 2.0
+	var bar_y: float = px.y - 30.0
+	var hp_ratio: float = float(_player_hp) / float(_max_player_hp)
+	var hp_color: Color = Color.GREEN if hp_ratio > 0.5 else (Color.YELLOW if hp_ratio > 0.25 else Color.RED)
+	draw_rect(Rect2(bar_x, bar_y, bar_w, bar_h), Color(0.2, 0.2, 0.2, 0.6))
+	draw_rect(Rect2(bar_x, bar_y, bar_w * hp_ratio, bar_h), hp_color)
 	for t in _bullet_trails:
 		var a: float = clamp(t.life / 0.15, 0.0, 1.0)
 		draw_line(t.origin, t.end, Color(1, 0.8, 0.2, a), 2)
