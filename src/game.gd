@@ -46,7 +46,7 @@ func _process(delta: float) -> void:
 		$Player.global_position += mx * 300.0 * delta
 	# Enemy AI: chase player
 	var enemy: ColorRect = $TestEnemy
-	if enemy and not _is_dodging:
+	if enemy:
 		var epos: Vector2 = enemy.position + Vector2(24, 24)
 		var chase_dir: Vector2 = ($Player.global_position - epos).normalized()
 		enemy.position += chase_dir * 120.0 * delta * Engine.time_scale
