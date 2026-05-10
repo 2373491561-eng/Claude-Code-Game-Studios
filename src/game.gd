@@ -41,8 +41,8 @@ func _process(delta: float) -> void:
 
 	if mx.length() > 0.1:
 		_last_move_dir = mx.normalized()
-		if not _is_dodging:
-			$Player.global_position += mx * 300.0 * delta
+	if not _is_dodging:
+		$Player.global_position += mx * 300.0 * delta
 
 	# Shooting
 	if not _is_dodging:
