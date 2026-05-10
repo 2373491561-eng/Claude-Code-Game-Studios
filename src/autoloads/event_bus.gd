@@ -76,3 +76,18 @@ signal enemy_killed(type: int, position: Vector2, index: int)
 ## [param position] World-space position where the enemy was spawned.
 ## [param index] Enemy index in the EnemyManager arrays.
 signal enemy_spawned(type: int, position: Vector2, index: int)
+
+## Emitted when a new wave begins.
+##
+## [param wave_num] The wave number that just started (1-indexed).
+signal wave_start(wave_num: int)
+
+## Emitted when a wave is cleared (all enemies killed).
+##
+## [param wave_num] The wave number that was just cleared.
+signal wave_clear(wave_num: int)
+
+## Emitted when the player selects an upgrade from the build card UI.
+##
+## [param upgrade_id] The string ID of the selected upgrade.
+signal upgrade_selected(upgrade_id: String)
