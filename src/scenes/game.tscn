@@ -1,2 +1,61 @@
-[gd_scene load_steps=0 format=2]
+[gd_scene load_steps=15 format=3 uid="uid://game001"]
+
+[ext_resource type="Script" path="res://src/game.gd" id="0_game"]
+[ext_resource type="Script" path="res://src/input/input_system.gd" id="1_input"]
+[ext_resource type="Script" path="res://src/player/player_movement.gd" id="2_movement"]
+[ext_resource type="Script" path="res://src/shooting/shooting_system.gd" id="3_shooting"]
+[ext_resource type="Script" path="res://src/dodge/dodge_system.gd" id="4_dodge"]
+[ext_resource type="Script" path="res://src/skill/skill_system.gd" id="5_skill"]
+[ext_resource type="Script" path="res://src/damage/damage_health_system.gd" id="6_damage"]
+[ext_resource type="Script" path="res://src/enemy/enemy_manager.gd" id="7_enemy"]
+[ext_resource type="Script" path="res://src/wave/wave_manager.gd" id="8_wave"]
+[ext_resource type="Script" path="res://src/build/build_system.gd" id="9_build"]
+[ext_resource type="Script" path="res://src/vfx/vfx_manager.gd" id="10_vfx"]
+[ext_resource type="Script" path="res://src/camera/camera_system.gd" id="11_camera"]
+[ext_resource type="Script" path="res://src/ui/diegetic_ui.gd" id="12_diegetic"]
+[ext_resource type="Script" path="res://src/ui/hud.gd" id="13_hud"]
+
 [node name="Game" type="Node2D"]
+script = ExtResource("0_game")
+
+[node name="InputSystem" type="Node" parent="."]
+script = ExtResource("1_input")
+
+[node name="Player" type="Node2D" parent="."]
+
+[node name="PlayerMovement" type="CharacterBody2D" parent="Player"]
+script = ExtResource("2_movement")
+
+[node name="ShootingSystem" type="Node2D" parent="Player"]
+script = ExtResource("3_shooting")
+
+[node name="DodgeSystem" type="Node2D" parent="Player"]
+script = ExtResource("4_dodge")
+
+[node name="SkillSystem" type="Node2D" parent="Player"]
+script = ExtResource("5_skill")
+
+[node name="DamageHealthSystem" type="Node" parent="Player"]
+script = ExtResource("6_damage")
+
+[node name="EnemyManager" type="Node2D" parent="."]
+script = ExtResource("7_enemy")
+
+[node name="WaveManager" type="Node" parent="."]
+script = ExtResource("8_wave")
+
+[node name="BuildSystem" type="Node" parent="."]
+script = ExtResource("9_build")
+
+[node name="VFXManager" type="Node2D" parent="."]
+script = ExtResource("10_vfx")
+
+[node name="CameraSystem" type="Camera2D" parent="."]
+script = ExtResource("11_camera")
+current = true
+
+[node name="DiegeticUI" type="Node2D" parent="Player"]
+script = ExtResource("12_diegetic")
+
+[node name="HUD" type="CanvasLayer" parent="."]
+script = ExtResource("13_hud")
