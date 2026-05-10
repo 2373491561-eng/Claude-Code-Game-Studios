@@ -2,6 +2,7 @@ extends Node2D
 
 var _was_shooting: bool = false
 var _bullet_trails: Array = []
+var _last_fire_ms: int = 0
 
 func _ready() -> void:
 	_safe_set($InputSystem, "player_node", $Player)
@@ -32,6 +33,9 @@ func _process(delta: float) -> void:
 		var aim: Vector2 = inp.get_aim_direction()
 		dbg.text = "Move=%.1f,%.1f | Shoot=%s | Aim=%.1f,%.1f" % [mx.x, mx.y, shoot, aim.x, aim.y]
 		if shoot and not _was_shooting:
+			_last_fire_ms = 0  # Reset cooldown on new press
+		if shoot and Time.get_ticks_msec() - _last_fire_ms >= 125:
+			_last_fire_ms = Time.get_ticks_msec()
 			_fire_bullet(aim)
 		_was_shooting = shoot
 
