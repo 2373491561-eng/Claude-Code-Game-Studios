@@ -1,26 +1,39 @@
 extends Node2D
 
+# Player state
+var _player_hp: int = 3
+var _max_player_hp: int = 3
+var _player_iframe_end: int = 0
+var _last_move_dir: Vector2 = Vector2.RIGHT
+var _move_speed: float = 300.0
+
+# Shooting
 var _was_shooting: bool = false
 var _bullet_trails: Array = []
 var _last_fire_ms: int = 0
-var _is_dodging: bool = false
-var _dodge_end_ms: int = 0
-var _last_move_dir: Vector2 = Vector2.RIGHT
-var _skill_cooldown_ms: int = 0
-var _skill_effects: Array = []
-var _player_hp: int = 3
-var _player_iframe_end: int = 0
-var _perfect_overlay: ColorRect = null
-var _enemies: Array = []
-var _enemy_bullets: Array = []
-var _wave_number: int = 1
-var _kill_count: int = 0
-var _upgrade_choices: Array = []
-var _showing_upgrades: bool = false
 var _fire_interval_ms: int = 125
 var _bonus_damage: int = 0
-var _max_player_hp: int = 3
-var _move_speed: float = 300.0
+
+# Dodge
+var _is_dodging: bool = false
+var _dodge_end_ms: int = 0
+
+# Skill
+var _skill_cooldown_ms: int = 0
+var _skill_effects: Array = []
+
+# Perfect dodge
+var _perfect_overlay: ColorRect = null
+
+# Enemies
+var _enemies: Array = []
+var _enemy_bullets: Array = []
+
+# Wave
+var _wave_number: int = 1
+var _kill_count: int = 0
+var _showing_upgrades: bool = false
+var _upgrade_choices: Array = []
 
 func _ready() -> void:
 	_safe_set($InputSystem, "player_node", $Player)
@@ -43,6 +56,10 @@ func _ready() -> void:
 	_spawn_wave()
 	print("Game ready! Wave %d" % _wave_number)
 
+# ============================================================
+# SPAWN
+# ============================================================
+
 func _spawn_wave() -> void:
 	for e in _enemies:
 		if is_instance_valid(e.rect):
@@ -59,23 +76,41 @@ func _spawn_wave() -> void:
 		else:
 			rect.color = Color(0.2, 1, 0.2, 1)
 			rect.size = Vector2(24, 24)
-		var ex: float; var ey: float
+		var ex: float
+		var ey: float
 		while true:
-			ex = randi_range(100, 800); ey = randi_range(100, 400)
-			if Vector2(ex - px, ey - py).length() > 200.0: break
+			ex = randi_range(100, 800)
+			ey = randi_range(100, 400)
+			if Vector2(ex - px, ey - py).length() > 200.0:
+				break
 		rect.position = Vector2(ex, ey)
 		add_child(rect)
-		_enemies.append({"rect": rect, "hp": 5 if is_medium else 3, "max_hp": 5 if is_medium else 3, "type": "medium" if is_medium else "small", "shoot_cd": 0})
+		_enemies.append({
+			"rect": rect,
+			"hp": 5 if is_medium else 3,
+			"max_hp": 5 if is_medium else 3,
+			"type": "medium" if is_medium else "small",
+			"shoot_cd": 0.0
+		})
 	print("WAVE %d: %d enemies" % [_wave_number, _enemies.size()])
+
+# ============================================================
+# MAIN LOOP
+# ============================================================
+
 func _process(delta: float) -> void:
+	if _showing_upgrades:
+		return
 	var inp: Node = $InputSystem
 	if not inp:
 		return
 	var mx: Vector2 = inp.get_move_axis()
-	if mx.length() > 1.0: mx = mx.normalized()
+	if mx.length() > 1.0:
+		mx = mx.normalized()
 	var shoot: bool = inp.is_shoot_pressed()
 	var aim: Vector2 = inp.get_aim_direction()
-	if mx.length() > 0.1: _last_move_dir = mx.normalized()
+	if mx.length() > 0.1:
+		_last_move_dir = mx.normalized()
 
 	# Player movement
 	if not _is_dodging:
@@ -83,22 +118,23 @@ func _process(delta: float) -> void:
 
 	# Enemy AI
 	for e in _enemies:
-		if e.hp <= 0: continue
+		if e.hp <= 0:
+			continue
 		var epos: Vector2 = e.rect.position + e.rect.size / 2.0
 		var to_player: Vector2 = $Player.global_position - epos
 		var dist: float = to_player.length()
+		# Small: chase
 		if e.type == "small":
 			if dist > 0.1:
 				e.rect.position += to_player.normalized() * 120.0 * delta * Engine.time_scale
+		# Medium: keep distance + shoot
 		else:
-			# Medium: keep distance 150px
 			if dist < 120.0 and dist > 0.1:
 				e.rect.position -= to_player.normalized() * 80.0 * delta * Engine.time_scale
 			elif dist > 180.0 and dist > 0.1:
 				e.rect.position += to_player.normalized() * 80.0 * delta * Engine.time_scale
-			# Shoot
 			e.shoot_cd -= delta * Engine.time_scale
-			if e.shoot_cd <= 0:
+			if e.shoot_cd <= 0.0:
 				e.shoot_cd = 2.0
 				var bullet := ColorRect.new()
 				bullet.color = Color(1, 0.5, 0, 1)
@@ -106,40 +142,28 @@ func _process(delta: float) -> void:
 				bullet.position = epos - Vector2(3, 3)
 				add_child(bullet)
 				_enemy_bullets.append({"rect": bullet, "pos": epos, "vel": to_player.normalized() * 150.0})
-		# Contact damage for both types
-		if dist < e.rect.size.x * 0.7 and Time.get_ticks_msec() > _player_iframe_end:
-			_player_hp -= 1
-			_player_iframe_end = Time.get_ticks_msec() + 1000
-			$Player/PlayerSprite.color = Color(1, 1, 1, 1)
-			var ht: Tween = create_tween()
-			ht.tween_property($Player/PlayerSprite, "color", Color(1, 0.3, 0.3, 1), 0.3)
-			if _player_hp <= 0:
-				_player_iframe_end = Time.get_ticks_msec() + 3000
-				_player_hp = _max_player_hp
-				$Player.global_position = Vector2(480, 400)
+		# Contact damage
+		var hit_size: float = e.rect.size.x * 0.7
+		if dist < hit_size and Time.get_ticks_msec() > _player_iframe_end:
+			_hurt_player()
 
-	# Move enemy bullets
+	# Enemy bullets
 	for i in range(_enemy_bullets.size() - 1, -1, -1):
 		var b: Dictionary = _enemy_bullets[i]
 		b.pos += b.vel * delta * Engine.time_scale
 		b.rect.position = b.pos - Vector2(3, 3)
-		if b.pos.x < 0 or b.pos.x > 960 or b.pos.y < 0 or b.pos.y > 540:
-			b.rect.queue_free(); _enemy_bullets.remove_at(i); continue
-		var dist_to_player: float = b.pos.distance_to($Player.global_position)
-		if dist_to_player < 16.0 and Time.get_ticks_msec() > _player_iframe_end:
-			_player_hp -= 1
-			_player_iframe_end = Time.get_ticks_msec() + 1000
-			$Player/PlayerSprite.color = Color(1, 1, 1, 1)
-			var ht: Tween = create_tween()
-			ht.tween_property($Player/PlayerSprite, "color", Color(1, 0.3, 0.3, 1), 0.3)
-			b.rect.queue_free(); _enemy_bullets.remove_at(i)
-			if _player_hp <= 0:
-				_player_iframe_end = Time.get_ticks_msec() + 3000
-				_player_hp = _max_player_hp
-				$Player.global_position = Vector2(480, 400)
+		if b.pos.x < -50 or b.pos.x > 1010 or b.pos.y < -50 or b.pos.y > 590:
+			b.rect.queue_free()
+			_enemy_bullets.remove_at(i)
+		elif b.pos.distance_to($Player.global_position) < 14.0 and Time.get_ticks_msec() > _player_iframe_end:
+			b.rect.queue_free()
+			_enemy_bullets.remove_at(i)
+			_hurt_player()
+
 	# Shooting
 	if not _is_dodging:
-		if shoot and not _was_shooting: _last_fire_ms = 0
+		if shoot and not _was_shooting:
+			_last_fire_ms = 0
 		if shoot and Time.get_ticks_msec() - _last_fire_ms >= _fire_interval_ms:
 			_last_fire_ms = Time.get_ticks_msec()
 			_fire_bullet(aim)
@@ -149,12 +173,15 @@ func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("dodge") and not _is_dodging and Time.get_ticks_msec() - _dodge_end_ms > 500:
 		var nearest_dist: float = 99999.0
 		for e in _enemies:
-			if e.hp <= 0: continue
-			var d: float = $Player.global_position.distance_to(e.rect.position + Vector2(12, 12))
-			if d < nearest_dist: nearest_dist = d
+			if e.hp <= 0:
+				continue
+			var d: float = $Player.global_position.distance_to(e.rect.position + e.rect.size / 2.0)
+			if d < nearest_dist:
+				nearest_dist = d
 		for b in _enemy_bullets:
 			var bd: float = $Player.global_position.distance_to(b.pos)
-			if bd < nearest_dist: nearest_dist = bd
+			if bd < nearest_dist:
+				nearest_dist = bd
 		_do_dodge(aim, nearest_dist < 50.0)
 
 	# Skill
@@ -163,46 +190,56 @@ func _process(delta: float) -> void:
 		_do_skill()
 
 	# Time scale recovery
-	if Engine.time_scale < 1.0:
+	if Engine.time_scale < 1.0 and not _showing_upgrades:
 		Engine.time_scale = clamp(Engine.time_scale + delta * 4.0, 0.2, 1.0)
 		if Engine.time_scale >= 1.0:
 			Engine.time_scale = 1.0
-			if _perfect_overlay: _perfect_overlay.visible = false
+			if _perfect_overlay:
+				_perfect_overlay.visible = false
 
-	# Debug
+	# Debug label
 	var dbg: Label = $DebugLabel
 	if dbg:
 		var alive: int = 0
 		for e in _enemies:
-			if e.hp > 0: alive += 1
+			if e.hp > 0:
+				alive += 1
 		var skill_ready: bool = Time.get_ticks_msec() - _skill_cooldown_ms > 3000
-		dbg.text = "HP:%d | Wave:%d | Enemies:%d | Kills:%d | Dodge:%s | Skill:%s" % [_player_hp, _wave_number, alive, _kill_count, _is_dodging, skill_ready]
+		dbg.text = "HP:%d/%d | Wave:%d | Enemies:%d | Kills:%d | Dodge:%s | Skill:%s" % [_player_hp, _max_player_hp, _wave_number, alive, _kill_count, _is_dodging, skill_ready]
 
 	# Bullet trails
 	for i in range(_bullet_trails.size() - 1, -1, -1):
 		_bullet_trails[i].life -= delta
-		if _bullet_trails[i].life <= 0: _bullet_trails.remove_at(i)
+		if _bullet_trails[i].life <= 0:
+			_bullet_trails.remove_at(i)
 	# Skill effects
 	for i in range(_skill_effects.size() - 1, -1, -1):
 		_skill_effects[i].life -= delta
 		_skill_effects[i].radius += 400.0 * delta
-		if _skill_effects[i].life <= 0: _skill_effects.remove_at(i)
+		if _skill_effects[i].life <= 0:
+			_skill_effects.remove_at(i)
 	queue_redraw()
+
+# ============================================================
+# COMBAT
+# ============================================================
 
 func _fire_bullet(aim: Vector2) -> void:
 	var origin: Vector2 = $Player.global_position
-	if aim.length() < 0.01: return
+	if aim.length() < 0.01:
+		return
 	var endpoint: Vector2 = origin + aim * 800.0
 	var closest: Dictionary = {}
 	var closest_dist: float = 99999.0
 	for e in _enemies:
-		if e.hp <= 0: continue
-		var ctr: Vector2 = e.rect.position + Vector2(12, 12)
+		if e.hp <= 0:
+			continue
+		var ctr: Vector2 = e.rect.position + e.rect.size / 2.0
 		var to_enemy: Vector2 = ctr - origin
 		var proj: float = to_enemy.dot(aim)
 		if proj > 0 and proj < closest_dist:
 			var perp: float = (to_enemy - aim * proj).length()
-			if perp < 20.0:
+			if perp < e.rect.size.x * 0.5:
 				closest_dist = proj
 				closest = e
 	if not closest.is_empty() and closest_dist < 800.0:
@@ -215,14 +252,16 @@ func _fire_bullet(aim: Vector2) -> void:
 			_check_wave_clear()
 		else:
 			var t := create_tween()
-			t.tween_property(closest.rect, "color", Color(0.2, 1, 0.2, 1), 0.2)
+			t.tween_property(closest.rect, "color", closest.rect.color, 0.0)
+			t.tween_property(closest.rect, "color", Color(0.2, 1, 0.2, 1) if closest.type == "small" else Color(1, 0.8, 0.2, 1), 0.2)
 	_bullet_trails.append({"origin": origin, "end": endpoint, "life": 0.15})
 
 func _do_skill() -> void:
 	var origin: Vector2 = $Player.global_position
 	for e in _enemies:
-		if e.hp <= 0: continue
-		if origin.distance_to(e.rect.position + Vector2(12, 12)) < 200.0:
+		if e.hp <= 0:
+			continue
+		if origin.distance_to(e.rect.position + e.rect.size / 2.0) < 200.0:
 			e.hp -= (1 + _bonus_damage)
 			e.rect.color = Color(1, 0.2, 0.2, 1)
 			if e.hp <= 0:
@@ -264,40 +303,56 @@ func _do_dodge(aim: Vector2, is_perfect: bool = false) -> void:
 		$Player/PlayerSprite.color = Color(1, 0.3, 0.3, 1)
 	)
 
+func _hurt_player() -> void:
+	_player_hp -= 1
+	_player_iframe_end = Time.get_ticks_msec() + 1000
+	$Player/PlayerSprite.color = Color(1, 1, 1, 1)
+	var ht: Tween = create_tween()
+	ht.tween_property($Player/PlayerSprite, "color", Color(1, 0.3, 0.3, 1), 0.3)
+	if _player_hp <= 0:
+		_player_iframe_end = Time.get_ticks_msec() + 3000
+		_player_hp = _max_player_hp
+		$Player.global_position = Vector2(480, 400)
+
+# ============================================================
+# WAVE / UPGRADES
+# ============================================================
+
 func _check_wave_clear() -> void:
 	var alive: int = 0
 	for e in _enemies:
-		if e.hp > 0: alive += 1
+		if e.hp > 0:
+			alive += 1
 	if alive <= 0 and not _showing_upgrades:
 		_show_upgrades()
 
 func _show_upgrades() -> void:
 	_showing_upgrades = true
 	_upgrade_choices.clear()
-	var pool := [
-		{"name": "Fire Rate +25%", "id": "fire_rate"},
-		{"name": "Damage +1", "id": "damage"},
-		{"name": "Max HP +1", "id": "max_hp"},
-		{"name": "Move Speed +20%", "id": "move_speed"},
-		{"name": "Dodge CD -200ms", "id": "dodge_cd"},
-		{"name": "Skill CD -1s", "id": "skill_cd"},
+	var pool: Array = [
+		{"name": "Fire Rate +25%", "id": "fire_rate", "icon": "🔥"},
+		{"name": "Damage +1", "id": "damage", "icon": "💪"},
+		{"name": "Max HP +1", "id": "max_hp", "icon": "❤️"},
+		{"name": "Move Speed +20%", "id": "move_speed", "icon": "🏃"},
+		{"name": "Dodge CD -200ms", "id": "dodge_cd", "icon": "🔄"},
+		{"name": "Skill CD -1s", "id": "skill_cd", "icon": "⚡"},
 	]
 	pool.shuffle()
-	for i in range(3):
-		var opt := pool[i]
-		var btn := Button.new()
-		btn.text = "[%d] %s" % [i + 1, opt.name]
-		btn.position = Vector2(300, 400 + i * 40)
-		btn.size = Vector2(360, 32)
-		btn.pressed.connect(func(): _pick_upgrade(opt.id))
-		add_child(btn)
-		_upgrade_choices.append(btn)
 	var label := Label.new()
 	label.text = "WAVE %d CLEARED! Choose upgrade (1/2/3):" % _wave_number
-	label.position = Vector2(300, 370)
+	label.position = Vector2(280, 350)
 	label.add_theme_font_size_override("font_size", 14)
 	add_child(label)
 	_upgrade_choices.append(label)
+	for i in range(3):
+		var opt: Dictionary = pool[i]
+		var btn := Button.new()
+		btn.text = "%s  [%d] %s" % [opt.icon, i + 1, opt.name]
+		btn.position = Vector2(300, 390 + i * 44)
+		btn.size = Vector2(360, 36)
+		btn.pressed.connect(func(id=opt.id): _pick_upgrade(id))
+		add_child(btn)
+		_upgrade_choices.append(btn)
 	Engine.time_scale = 0.05
 
 func _pick_upgrade(id: String) -> void:
@@ -307,15 +362,36 @@ func _pick_upgrade(id: String) -> void:
 	_showing_upgrades = false
 	Engine.time_scale = 1.0
 	match id:
-		"fire_rate": _fire_interval_ms = max(50, _fire_interval_ms - 30)
-		"damage": _bonus_damage += 1
-		"max_hp": _player_hp = min(_player_hp + 1, 6); _max_player_hp += 1
-		"move_speed": _move_speed += 60
-		"dodge_cd": _dodge_end_ms = 0
-		"skill_cd": _skill_cooldown_ms = 0
+		"fire_rate":
+			_fire_interval_ms = max(50, _fire_interval_ms - 30)
+		"damage":
+			_bonus_damage += 1
+		"max_hp":
+			_max_player_hp += 1
+			_player_hp = min(_player_hp + 1, _max_player_hp)
+		"move_speed":
+			_move_speed += 60.0
+		"dodge_cd":
+			_dodge_end_ms = 0
+		"skill_cd":
+			_skill_cooldown_ms = 0
 	_wave_number += 1
 	_spawn_wave()
 
-func _safe_set
+# ============================================================
+# RENDER
+# ============================================================
+
+func _draw() -> void:
+	for t in _bullet_trails:
+		var a: float = clamp(t.life / 0.15, 0.0, 1.0)
+		draw_line(t.origin, t.end, Color(1, 0.8, 0.2, a), 2)
+	for s in _skill_effects:
+		var a: float = clamp(s.life / 0.5, 0.0, 1.0)
+		draw_arc(s.pos, s.radius, 0, TAU, 36, Color(0.2, 0.6, 1, a), 3)
+	for b in _enemy_bullets:
+		draw_circle(b.pos, 3, Color(1, 0.5, 0, 1))
+
+func _safe_set(node: Node, prop: String, value: Node) -> void:
 	if node and prop in node:
 		node.set(prop, value)
