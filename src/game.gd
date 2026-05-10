@@ -4,6 +4,11 @@ var _was_shooting: bool = false
 var _bullet_trails: Array = []
 var _last_fire_ms: int = 0
 var _hit_count: int = 0
+var _is_dodging: bool = false
+var _dodge_start_ms: int = 0
+var _dodge_dir: Vector2 = Vector2.ZERO
+var _dodge_origin: Vector2 = Vector2.ZERO
+var _last_move_dir: Vector2 = Vector2.RIGHT
 
 func _ready() -> void:
 	_safe_set($InputSystem, "player_node", $Player)
