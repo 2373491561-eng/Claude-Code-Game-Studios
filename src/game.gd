@@ -39,23 +39,8 @@ var _upgrade_choices: Array = []
 var _death_particles: Array = []
 
 func _ready() -> void:
-	_safe_set($InputSystem, "player_node", $Player)
-	_safe_set($Player, "input_system", $InputSystem)
-	_safe_set($Player/ShootingSystem, "input_system", $InputSystem)
-	_safe_set($Player/ShootingSystem, "enemy_manager", $EnemyManager)
-	_safe_set($Player/ShootingSystem, "skill_system", $Player/SkillSystem)
-	_safe_set($Player/DodgeSystem, "input_system", $InputSystem)
-	_safe_set($Player/DodgeSystem, "player_movement", $Player)
-	_safe_set($Player/DodgeSystem, "enemy_manager", $EnemyManager)
-	_safe_set($Player/SkillSystem, "input_system", $InputSystem)
-	_safe_set($Player/SkillSystem, "dodge_system", $Player/DodgeSystem)
-	_safe_set($Player/DamageHealthSystem, "dodge_system", $Player/DodgeSystem)
-	_safe_set($Player/DamageHealthSystem, "skill_system", $Player/SkillSystem)
-	_safe_set($Player/DamageHealthSystem, "input_system", $InputSystem)
-	_safe_set($Player/DiegeticUI, "damage_health_system", $Player/DamageHealthSystem)
-	_safe_set($Player/DiegeticUI, "dodge_system", $Player/DodgeSystem)
-	_safe_set($Player/DiegeticUI, "skill_system", $Player/SkillSystem)
-	_safe_set($HUD, "wave_manager", $WaveManager)
+	if $InputSystem and "player_node" in $InputSystem:
+		$InputSystem.set("player_node", $Player)
 	_spawn_wave()
 
 # ============================================================
@@ -427,6 +412,3 @@ func _draw() -> void:
 		var a: float = clamp(dp.life / 0.4, 0.0, 1.0)
 		draw_rect(Rect2(dp.pos.x - 3, dp.pos.y - 3, 6, 6), Color(dp.color.r, dp.color.g, dp.color.b, a))
 
-func _safe_set(node: Node, prop: String, value: Node) -> void:
-	if node and prop in node:
-		node.set(prop, value)

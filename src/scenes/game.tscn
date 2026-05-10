@@ -1,18 +1,7 @@
-[gd_scene load_steps=14 format=3 uid="uid://dg6"]
+[gd_scene load_steps=2 format=3 uid="uid://dg7"]
 
 [ext_resource type="Script" path="res://src/game.gd" id="0"]
 [ext_resource type="Script" path="res://src/input/input_system.gd" id="1"]
-[ext_resource type="Script" path="res://src/player/player_movement.gd" id="2"]
-[ext_resource type="Script" path="res://src/shooting/shooting_system.gd" id="3"]
-[ext_resource type="Script" path="res://src/dodge/dodge_system.gd" id="4"]
-[ext_resource type="Script" path="res://src/skill/skill_system.gd" id="5"]
-[ext_resource type="Script" path="res://src/damage/damage_health_system.gd" id="6"]
-[ext_resource type="Script" path="res://src/enemy/enemy_manager.gd" id="7"]
-[ext_resource type="Script" path="res://src/wave/wave_manager.gd" id="8"]
-[ext_resource type="Script" path="res://src/camera/camera_system.gd" id="9"]
-[ext_resource type="Script" path="res://src/vfx/vfx_manager.gd" id="10"]
-[ext_resource type="Script" path="res://src/ui/diegetic_ui.gd" id="11"]
-[ext_resource type="Script" path="res://src/ui/hud.gd" id="12"]
 
 [node name="Game" type="Node2D"]
 script = ExtResource("0")
@@ -32,33 +21,6 @@ color = Color(1, 0.3, 0.3, 1)
 size = Vector2(20, 20)
 position = Vector2(-10, -10)
 
-[node name="ShootingSystem" type="Node2D" parent="Player"]
-script = ExtResource("3")
-
-[node name="DodgeSystem" type="Node2D" parent="Player"]
-script = ExtResource("4")
-
-[node name="SkillSystem" type="Node2D" parent="Player"]
-script = ExtResource("5")
-
-[node name="DamageHealthSystem" type="Node" parent="Player"]
-script = ExtResource("6")
-
-[node name="EnemyManager" type="Node2D" parent="."]
-script = ExtResource("7")
-
-[node name="WaveManager" type="Node" parent="."]
-script = ExtResource("8")
-
-[node name="VFXManager" type="Node2D" parent="."]
-script = ExtResource("10")
-
-[node name="DiegeticUI" type="Node2D" parent="Player"]
-script = ExtResource("11")
-
-[node name="HUD" type="CanvasLayer" parent="."]
-script = ExtResource("12")
-
 [node name="DebugLabel" type="Label" parent="."]
-text = "Red=You | Green=Enemy | WASD=Move | Click=Shoot | Shift=Dodge | Space=Skill"
-position = Vector2(160, 510)
+text = "WASD=Move | Click=Shoot | Shift=Dodge | Space=Skill"
+position = Vector2(200, 515)
