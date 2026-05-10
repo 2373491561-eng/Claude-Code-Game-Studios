@@ -44,6 +44,12 @@ func _process(delta: float) -> void:
 		_last_move_dir = mx.normalized()
 	if not _is_dodging:
 		$Player.global_position += mx * 300.0 * delta
+	# Enemy AI: chase player
+	var enemy: ColorRect = $TestEnemy
+	if enemy and not _is_dodging:
+		var epos: Vector2 = enemy.position + Vector2(24, 24)
+		var chase_dir: Vector2 = ($Player.global_position - epos).normalized()
+		enemy.position += chase_dir * 120.0 * delta * Engine.time_scale
 	# Shooting
 	if not _is_dodging:
 		if shoot and not _was_shooting:
