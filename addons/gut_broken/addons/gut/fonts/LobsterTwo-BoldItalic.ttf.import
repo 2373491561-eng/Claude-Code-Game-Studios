@@ -2,13 +2,13 @@
 
 importer="font_data_dynamic"
 type="FontFile"
-uid="uid://bnh0lslf4yh87"
-path="res://.godot/imported/CourierPrime-Regular.ttf-3babe7e4a7a588dfc9a84c14b4f1fe23.fontdata"
+uid="uid://bll38n2ct6qme"
+path="res://.godot/imported/LobsterTwo-BoldItalic.ttf-227406a33e84448e6aa974176016de19.fontdata"
 
 [deps]
 
-source_file="res://addons/gut/fonts/CourierPrime-Regular.ttf"
-dest_files=["res://.godot/imported/CourierPrime-Regular.ttf-3babe7e4a7a588dfc9a84c14b4f1fe23.fontdata"]
+source_file="res://addons/gut/fonts/LobsterTwo-BoldItalic.ttf"
+dest_files=["res://.godot/imported/LobsterTwo-BoldItalic.ttf-227406a33e84448e6aa974176016de19.fontdata"]
 
 [params]
 

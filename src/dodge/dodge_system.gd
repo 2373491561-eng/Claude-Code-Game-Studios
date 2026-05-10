@@ -360,9 +360,9 @@ func _apply_dodge_displacement() -> void:
 	var elapsed_ms := Time.get_ticks_msec() - _dodge_start_ms
 	var progress := clampf(elapsed_ms / float(DODGE_DURATION_MS), 0.0, 1.0)
 
-	var target_pos := _dodge_start_pos + _dodge_direction * DODGE_DISTANCE * progress
-	var current_pos := player_movement.global_position
-	var step := target_pos - current_pos
+	var target_pos: Vector2 = _dodge_start_pos + _dodge_direction * DODGE_DISTANCE * progress
+	var current_pos: Vector2 = player_movement.global_position
+	var step: Vector2 = target_pos - current_pos
 
 	if step.length_squared() < 0.01:
 		# Negligible step -- all displacement is done (or blocked).
@@ -446,7 +446,7 @@ func _post_dodge_overlap_resolution() -> void:
 	if player_movement == null:
 		return
 
-	var start_pos := player_movement.global_position
+	var start_pos: Vector2 = player_movement.global_position
 	var best_pos := start_pos
 	var found_clear := false
 
@@ -460,7 +460,7 @@ func _post_dodge_overlap_resolution() -> void:
 		for dir_idx in range(POST_DODGE_DIRECTIONS):
 			var angle := float(dir_idx) * angle_step
 			var offset := Vector2(cos(angle), sin(angle)) * radius
-			var test_pos := start_pos + offset
+			var test_pos: Vector2 = start_pos + offset
 
 			# Quick bounds check: ensure we don't go outside reasonable world bounds.
 			# We check if the position is valid by testing a tiny move.

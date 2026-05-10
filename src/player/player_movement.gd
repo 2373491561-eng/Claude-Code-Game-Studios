@@ -1,5 +1,6 @@
 ## PlayerMovement -- WASD movement controller using CharacterBody2D.
 extends CharacterBody2D
+class_name PlayerMovement
 
 @export var input_system: Node = null
 @export var move_speed: float = 300.0
