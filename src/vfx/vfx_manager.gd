@@ -451,7 +451,7 @@ func reset_all_pools() -> void:
 		var pool: ParticlePool = _pools[pool_type]
 		# Release all active particles.
 		while pool.active.size() > 0:
-			var p := pool.active.pop_back()
+			var p: Node2D = pool.active.pop_back()
 			pool.spawn_timestamps.pop_back()
 			p.visible = false
 			p.process_mode = Node.PROCESS_MODE_DISABLED

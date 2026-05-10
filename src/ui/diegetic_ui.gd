@@ -161,7 +161,7 @@ func _read_max_hp() -> int:
 func _update_animations(delta: float) -> void:
 	# Update shatter particles.
 	for i in range(_shatter_particles.size() - 1, -1, -1):
-		var p: Node2D = _shatter_particles[i]
+		var p: Dictionary = _shatter_particles[i]
 		p.alpha -= delta * 2.0
 		p.offset += p.vel * delta
 		if p.alpha <= 0.0:
@@ -193,7 +193,7 @@ func _draw_health_halo() -> void:
 
 	# Draw shatter particles.
 	for p in _shatter_particles:
-		var pos := Vector2(cos(p.angle), sin(p.angle)) * (HALO_RADIUS + p.offset)
+		var pos: Vector2 = Vector2(cos(p.angle), sin(p.angle)) * (HALO_RADIUS + p.offset)
 		var shatter_color := COLOR_HEALTH_SEGMENT
 		shatter_color.a = p.alpha
 		draw_circle(pos, 2.0, shatter_color)
@@ -273,7 +273,7 @@ func _draw_dodge_dots() -> void:
 
 	for i in range(3):
 		var angle := float(i) * TAU / 3.0 - TAU / 4.0  # Start from top
-		var pos := Vector2(cos(angle), sin(angle)) * DODGE_ORBIT_RADIUS
+		var pos: Vector2 = Vector2(cos(angle), sin(angle)) * DODGE_ORBIT_RADIUS
 		var radius := DODGE_DOT_RADIUS
 		var color: Color
 
