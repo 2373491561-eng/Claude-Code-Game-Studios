@@ -85,7 +85,7 @@ class ParticlePool:
 
 	## Resets a particle to its default state.
 	func _reset_particle(p: Node2D) -> void:
-		if p is GpuParticles2D:
+		if p is GPUParticles2D:
 			p.emitting = false
 			p.amount = 0
 		p.scale = Vector2.ONE
@@ -157,7 +157,7 @@ func _process(_delta: float) -> void:
 	# Update particle speed scales.
 	for pool in _pools.values():
 		for p in pool.active:
-			if p is GpuParticles2D:
+			if p is GPUParticles2D:
 				p.speed_scale = Engine.time_scale
 
 	# Periodic expired-particle sweep.
@@ -173,14 +173,14 @@ func _process(_delta: float) -> void:
 
 func _init_pools() -> void:
 	_create_pool(PoolType.BULLET_TRAIL, POOL_BULLET_TRAIL, false)   # Sprite2D for trails
-	_create_pool(PoolType.HIT_SPARK, POOL_HIT_SPARK, true)           # GpuParticles2D
+	_create_pool(PoolType.HIT_SPARK, POOL_HIT_SPARK, true)           # GPUParticles2D
 	_create_pool(PoolType.DODGE_AFTERIMAGE, POOL_DODGE_AFTERIMAGE, false)  # Sprite2D
-	_create_pool(PoolType.SKILL_SHOCKWAVE, POOL_SKILL_SHOCKWAVE, true)     # GpuParticles2D
-	_create_pool(PoolType.SKILL_CORE, POOL_SKILL_CORE, true)               # GpuParticles2D
-	_create_pool(PoolType.DEATH_SHATTER, POOL_DEATH_SHATTER, true)         # GpuParticles2D
+	_create_pool(PoolType.SKILL_SHOCKWAVE, POOL_SKILL_SHOCKWAVE, true)     # GPUParticles2D
+	_create_pool(PoolType.SKILL_CORE, POOL_SKILL_CORE, true)               # GPUParticles2D
+	_create_pool(PoolType.DEATH_SHATTER, POOL_DEATH_SHATTER, true)         # GPUParticles2D
 
 ## Creates a particle pool of the given type and size.
-## [param use_gpu]: if true, creates GpuParticles2D; if false, creates Sprite2D.
+## [param use_gpu]: if true, creates GPUParticles2D; if false, creates Sprite2D.
 func _create_pool(pool_type: int, size: int, use_gpu: bool) -> void:
 	var pool := ParticlePool.new(pool_type)
 	_pools[pool_type] = pool
@@ -198,9 +198,9 @@ func _create_pool(pool_type: int, size: int, use_gpu: bool) -> void:
 		add_child(node)
 		pool.available.append(node)
 
-## Creates a GpuParticles2D node with minimal configuration for the given pool type.
-func _create_gpu_particle(pool_type: int) -> GpuParticles2D:
-	var p := GpuParticles2D.new()
+## Creates a GPUParticles2D node with minimal configuration for the given pool type.
+func _create_gpu_particle(pool_type: int) -> GPUParticles2D:
+	var p := GPUParticles2D.new()
 	p.one_shot = true
 	p.explosiveness = 1.0
 	p.emitting = false
@@ -271,7 +271,7 @@ func acquire(pool_type: int) -> Node2D:
 			particle = pool.active.pop_front()
 			pool.spawn_timestamps.pop_front()
 			# Reset before reuse.
-			if particle is GpuParticles2D:
+			if particle is GPUParticles2D:
 				particle.emitting = false
 				particle.amount = 0
 			particle.scale = Vector2.ONE
@@ -312,8 +312,8 @@ func spawn(pool_type: int, pos: Vector2, config: Dictionary = {}) -> void:
 			particle.rotation = dir.angle()
 
 	# Start emitting if it's a GPU particle.
-	if particle is GpuParticles2D:
-		var gpu := particle as GpuParticles2D
+	if particle is GPUParticles2D:
+		var gpu := particle as GPUParticles2D
 		gpu.emitting = true
 		# Auto-release after lifetime.
 		var lifetime := gpu.lifetime
@@ -455,7 +455,7 @@ func reset_all_pools() -> void:
 			pool.spawn_timestamps.pop_back()
 			p.visible = false
 			p.process_mode = Node.PROCESS_MODE_DISABLED
-			if p is GpuParticles2D:
+			if p is GPUParticles2D:
 				p.emitting = false
 				p.amount = 0
 			p.scale = Vector2.ONE

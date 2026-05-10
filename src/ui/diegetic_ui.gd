@@ -121,7 +121,7 @@ func _draw() -> void:
 func _update_state() -> void:
 	# Read HP from system.
 	if damage_health_system != null and damage_health_system.has_method("get_hp"):
-		var current_hp := damage_health_system.get_hp()
+		var current_hp: int = damage_health_system.get_hp()
 		_max_hp = _read_max_hp()
 
 		if current_hp < _displayed_hp:
@@ -135,11 +135,11 @@ func _update_state() -> void:
 
 	# Detect dodge charge consumption via DodgeSystem.
 	if dodge_system != null and dodge_system.has_method("get_charge_count"):
-		var current_charges := dodge_system.get_charge_count()
+		var current_charges: int = dodge_system.get_charge_count()
 		if current_charges < _previous_charge_count:
-			var dots_consumed := _previous_charge_count - current_charges
+			var dots_consumed: int = _previous_charge_count - current_charges
 			for d in range(dots_consumed):
-				var dot_idx := _previous_charge_count - 1 - d
+				var dot_idx: int = _previous_charge_count - 1 - d
 				if dot_idx >= 0 and dot_idx < 3:
 					_dot_consumed_flash[dot_idx] = 0.3  # 300ms flash
 		_previous_charge_count = current_charges
@@ -161,7 +161,7 @@ func _read_max_hp() -> int:
 func _update_animations(delta: float) -> void:
 	# Update shatter particles.
 	for i in range(_shatter_particles.size() - 1, -1, -1):
-		var p := _shatter_particles[i]
+		var p: Node2D = _shatter_particles[i]
 		p.alpha -= delta * 2.0
 		p.offset += p.vel * delta
 		if p.alpha <= 0.0:

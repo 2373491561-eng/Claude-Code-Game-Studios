@@ -943,7 +943,7 @@ func _process_removal_queue() -> void:
 	for _n in range(to_process):
 		if _pending_removal.is_empty():
 			break
-		var idx := _pending_removal.pop_back()
+		var idx: int = _pending_removal.pop_back()
 		_remove_slot(idx)
 
 ## Removes an enemy slot by swapping the last active enemy into it.

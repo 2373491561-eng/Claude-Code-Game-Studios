@@ -173,7 +173,8 @@ func _process(_delta: float) -> void:
 func _create_audio_buses() -> void:
 	for bus_name in BUS_NAMES:
 		if AudioServer.get_bus_index(bus_name) == -1:
-			var idx := AudioServer.add_bus()
+			AudioServer.add_bus()
+			var idx := AudioServer.get_bus_count() - 1
 			AudioServer.set_bus_name(idx, bus_name)
 			AudioServer.set_bus_volume_db(idx, DEFAULT_VOLUME_DB)
 

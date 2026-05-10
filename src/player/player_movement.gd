@@ -15,7 +15,7 @@
 ##
 ##   # Other systems can query movement state:
 ##   var move_dir := player_movement.get_last_move_direction()
-##   var speed := player_movement.get_velocity()
+##   var speed := player_movement.velocity()
 ##   [/codeblock]
 class_name PlayerMovement extends CharacterBody2D
 
@@ -35,7 +35,7 @@ class_name PlayerMovement extends CharacterBody2D
 # ---------------------------------------------------------------------------
 
 ## Cached velocity from the last physics frame.
-## Exposed via get_velocity() so other systems can query current speed/direction.
+## Exposed via velocity() so other systems can query current speed/direction.
 var _velocity: Vector2 = Vector2.ZERO
 
 ## Cached last non-zero move direction.
@@ -107,5 +107,5 @@ func get_last_move_direction() -> Vector2:
 ##
 ## This is the post-normalization velocity that was applied via
 ## move_and_slide(). Magnitude is at most move_speed.
-func get_velocity() -> Vector2:
+func velocity() -> Vector2:
 	return _velocity

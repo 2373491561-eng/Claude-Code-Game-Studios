@@ -14,6 +14,10 @@ config/name="Rift Reaction"
 run/main_scene="res://src/scenes/main_menu.tscn"
 config/features=PackedStringArray("4.6")
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/gut/plugin.cfg")
+
 [autoload]
 
 EventBus="*res://src/autoloads/event_bus.gd"
