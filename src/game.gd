@@ -2,12 +2,12 @@ extends Node2D
 
 func _ready() -> void:
 	_safe_set($InputSystem, "player_node", $Player)
-	_safe_set($Player/PlayerMovement, "input_system", $InputSystem)
+	_safe_set($Player, "input_system", $InputSystem)
 	_safe_set($Player/ShootingSystem, "input_system", $InputSystem)
 	_safe_set($Player/ShootingSystem, "enemy_manager", $EnemyManager)
 	_safe_set($Player/ShootingSystem, "skill_system", $Player/SkillSystem)
 	_safe_set($Player/DodgeSystem, "input_system", $InputSystem)
-	_safe_set($Player/DodgeSystem, "player_movement", $Player/PlayerMovement)
+	_safe_set($Player/DodgeSystem, "player_movement", $Player)
 	_safe_set($Player/DodgeSystem, "enemy_manager", $EnemyManager)
 	_safe_set($Player/SkillSystem, "input_system", $InputSystem)
 	_safe_set($Player/SkillSystem, "dodge_system", $Player/DodgeSystem)
