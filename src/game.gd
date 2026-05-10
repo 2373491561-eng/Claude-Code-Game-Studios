@@ -10,6 +10,8 @@ var _skill_cooldown_ms: int = 0
 var _skill_effects: Array = []
 var _enemy_hp: int = 3
 var _enemy_kills: int = 0
+var _player_hp: int = 3
+var _player_iframe_end: int = 0
 var _time_scale_recover: float = 1.0
 var _perfect_overlay: ColorRect = null
 func _ready() -> void:
@@ -50,6 +52,18 @@ func _process(delta: float) -> void:
 		var epos: Vector2 = enemy.position + Vector2(24, 24)
 		var chase_dir: Vector2 = ($Player.global_position - epos).normalized()
 		enemy.position += chase_dir * 120.0 * delta * Engine.time_scale
+		var dist_to_player: float = (enemy.position + Vector2(24, 24)).distance_to($Player.global_position)
+		if dist_to_player < 30.0 and Time.get_ticks_msec() > _player_iframe_end:
+			_player_hp -= 1
+			_player_iframe_end = Time.get_ticks_msec() + 500
+			$Player/PlayerSprite.color = Color(1, 1, 1, 1)
+			var ht: Tween = create_tween()
+			ht.tween_property($Player/PlayerSprite, "color", Color(1, 0.3, 0.3, 1), 0.3)
+			if _player_hp <= 0:
+				_player_hp = 3
+				$Player.global_position = Vector2(480, 400)
+				print("YOU DIED! Respawning...")
+	# Player contact damage
 	# Shooting
 	if not _is_dodging:
 		if shoot and not _was_shooting:
@@ -75,7 +89,7 @@ func _process(delta: float) -> void:
 	var dbg: Label = $DebugLabel
 	if dbg:
 		var skill_ready: bool = Time.get_ticks_msec() - _skill_cooldown_ms > 3000
-		dbg.text = "HP=%d | Kills=%d | Dodge=%s | Skill=%s" % [_enemy_hp, _enemy_kills, _is_dodging, skill_ready]
+		dbg.text = "You=%d | Enemy=%d | Kills=%d | Dodge=%s | Skill=%s" % [_player_hp, _enemy_hp, _enemy_kills, _is_dodging, skill_ready] % [_enemy_hp, _enemy_kills, _is_dodging, skill_ready]
 	# Bullet trails
 	for i in range(_bullet_trails.size() - 1, -1, -1):
 		_bullet_trails[i].life -= delta
