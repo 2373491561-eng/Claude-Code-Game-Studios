@@ -69,7 +69,7 @@ class ParticlePool:
 	func _reset_particle(p: Node2D) -> void:
 		if p is GPUParticles2D:
 			p.emitting = false
-			p.amount = 0
+			p.amount = 1
 		p.scale = Vector2.ONE
 		p.modulate = Color.WHITE
 		p.rotation = 0.0
@@ -431,7 +431,7 @@ func reset_all_pools() -> void:
 			p.process_mode = Node.PROCESS_MODE_DISABLED
 			if p is GPUParticles2D:
 				p.emitting = false
-				p.amount = 0
+				p.amount = 1
 			p.scale = Vector2.ONE
 			p.modulate = Color.WHITE
 			p.rotation = 0.0
