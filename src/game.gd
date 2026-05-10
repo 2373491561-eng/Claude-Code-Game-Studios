@@ -3,6 +3,7 @@ extends Node2D
 var _was_shooting: bool = false
 var _bullet_trails: Array = []
 var _last_fire_ms: int = 0
+var _hit_count: int = 0
 
 func _ready() -> void:
 	_safe_set($InputSystem, "player_node", $Player)
@@ -53,17 +54,16 @@ func _fire_bullet(aim: Vector2) -> void:
 
 	var enemy: ColorRect = $TestEnemy
 	if enemy:
-		var epos: Vector2 = enemy.global_position + enemy.size / 2.0
-		var esize: float = enemy.size.x / 2.0
+		var epos: Vector2 = enemy.position + Vector2(24, 24)
 		var to_enemy: Vector2 = epos - origin
 		var proj: float = to_enemy.dot(aim)
 		if proj > 0 and proj < 800.0:
-			var perp: Vector2 = to_enemy - aim * proj
-			if perp.length() < esize:
+			var perp: float = (to_enemy - aim * proj).length()
+			if perp < 24.0:
 				endpoint = origin + aim * proj
-				enemy.color = Color(0.8, 0.2, 0.2, 1)
-				var tween: Tween = create_tween()
-				tween.tween_property(enemy, "color", Color(0.3, 0.8, 0.3, 1), 0.3)
+				enemy.color = Color(1, 0.2, 0.2, 1) if enemy.color.g > 0.5 else Color(0.2, 1, 0.2, 1)
+				_hit_count += 1
+				$DebugLabel.text = "HIT x%d! "% _hit_count + $DebugLabel.text.split("!")[-1].strip_edges()
 
 	_bullet_trails.append({"origin": origin, "end": endpoint, "life": 0.15})
 
